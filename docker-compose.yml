@@ -1,0 +1,19 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pm_frontend
+    ports:
+      - "3000:3000"
+
+  backend:
+    build: .
+    container_name: pm_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - frontend
+

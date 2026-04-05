@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,17 +13,66 @@ import {
 } from "@dnd-kit/core";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
+import { AiChatWidget } from "@/components/AiChatWidget";
 import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
 
 export const KanbanBoard = () => {
   const [board, setBoard] = useState<BoardData>(() => initialData);
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
     })
   );
+
+  useEffect(() => {
+    const loadBoard = async () => {
+      setIsLoading(true);
+      setError("");
+      try {
+        const res = await fetch("/api/kanban?user=user");
+        if (!res.ok) throw new Error(`Unable to load board: ${res.status}`);
+        const data = await res.json();
+        setBoard(data as BoardData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+        setBoard(initialData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBoard();
+  }, []);
+
+  const saveBoard = async (updatedBoard: BoardData) => {
+    try {
+      await fetch("/api/kanban", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user: "user", board: updatedBoard }),
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const setAndSave = (updater: (prevBoard: BoardData) => BoardData) => {
+    setBoard((prev) => {
+      const next = updater(prev);
+      saveBoard(next);
+      return next;
+    });
+  };
+
+  const syncBoard = (nextBoard: BoardData) => {
+    setBoard(nextBoard);
+    saveBoard(nextBoard);
+  };
+
 
   const cardsById = useMemo(() => board.cards, [board.cards]);
 
@@ -39,14 +88,14 @@ export const KanbanBoard = () => {
       return;
     }
 
-    setBoard((prev) => ({
+    setAndSave((prev) => ({
       ...prev,
       columns: moveCard(prev.columns, active.id as string, over.id as string),
     }));
   };
 
   const handleRenameColumn = (columnId: string, title: string) => {
-    setBoard((prev) => ({
+    setAndSave((prev) => ({
       ...prev,
       columns: prev.columns.map((column) =>
         column.id === columnId ? { ...column, title } : column
@@ -56,7 +105,7 @@ export const KanbanBoard = () => {
 
   const handleAddCard = (columnId: string, title: string, details: string) => {
     const id = createId("card");
-    setBoard((prev) => ({
+    setAndSave((prev) => ({
       ...prev,
       cards: {
         ...prev.cards,
@@ -71,25 +120,74 @@ export const KanbanBoard = () => {
   };
 
   const handleDeleteCard = (columnId: string, cardId: string) => {
-    setBoard((prev) => {
+    setAndSave((prev) => ({
+      ...prev,
+      cards: Object.fromEntries(
+        Object.entries(prev.cards).filter(([id]) => id !== cardId)
+      ),
+      columns: prev.columns.map((column) =>
+        column.id === columnId
+          ? {
+              ...column,
+              cardIds: column.cardIds.filter((id) => id !== cardId),
+            }
+          : column
+      ),
+    }));
+  };
+
+  const moveCardToColumn = (cardId: string, fromColId: string, toColId: string) => {
+    setAndSave((prev) => {
+      const fromIndex = prev.columns.findIndex((c) => c.id === fromColId);
+      const toIndex = prev.columns.findIndex((c) => c.id === toColId);
+      if (fromIndex === -1 || toIndex === -1 || fromColId === toColId) {
+        return prev;
+      }
+
+      const source = prev.columns[fromIndex];
+      const target = prev.columns[toIndex];
+      if (!source.cardIds.includes(cardId)) {
+        return prev;
+      }
+
       return {
         ...prev,
-        cards: Object.fromEntries(
-          Object.entries(prev.cards).filter(([id]) => id !== cardId)
-        ),
-        columns: prev.columns.map((column) =>
-          column.id === columnId
-            ? {
-                ...column,
-                cardIds: column.cardIds.filter((id) => id !== cardId),
-              }
-            : column
-        ),
+        columns: prev.columns.map((column) => {
+          if (column.id === fromColId) {
+            return { ...column, cardIds: column.cardIds.filter((id) => id !== cardId) };
+          }
+          if (column.id === toColId) {
+            return { ...column, cardIds: [...column.cardIds, cardId] };
+          }
+          return column;
+        }),
       };
     });
   };
 
+  const handleMoveLeft = (columnId: string, cardId: string) => {
+    const idx = board.columns.findIndex((col) => col.id === columnId);
+    if (idx > 0) {
+      moveCardToColumn(cardId, columnId, board.columns[idx - 1].id);
+    }
+  };
+
+  const handleMoveRight = (columnId: string, cardId: string) => {
+    const idx = board.columns.findIndex((col) => col.id === columnId);
+    if (idx < board.columns.length - 1) {
+      moveCardToColumn(cardId, columnId, board.columns[idx + 1].id);
+    }
+  };
+
   const activeCard = activeCardId ? cardsById[activeCardId] : null;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center text-base text-[var(--gray-text)]">
+        Loading Kanban board...
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-hidden">
@@ -133,13 +231,19 @@ export const KanbanBoard = () => {
           </div>
         </header>
 
+        {error ? (
+          <div className="rounded-lg border border-red-300 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
+
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <section className="grid gap-6 lg:grid-cols-5">
+          <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {board.columns.map((column) => (
               <KanbanColumn
                 key={column.id}
@@ -148,6 +252,8 @@ export const KanbanBoard = () => {
                 onRename={handleRenameColumn}
                 onAddCard={handleAddCard}
                 onDeleteCard={handleDeleteCard}
+                onMoveLeft={handleMoveLeft}
+                onMoveRight={handleMoveRight}
               />
             ))}
           </section>
@@ -159,6 +265,10 @@ export const KanbanBoard = () => {
             ) : null}
           </DragOverlay>
         </DndContext>
+
+        <section className="mt-8">
+          <AiChatWidget board={board} onBoardUpdate={syncBoard} />
+        </section>
       </main>
     </div>
   );

@@ -2,12 +2,14 @@ import { expect, test } from "@playwright/test";
 
 test("loads the kanban board", async ({ page }) => {
   await page.goto("/");
+  await page.waitForSelector('h1:has-text("Kanban Studio")', { timeout: 30000 });
   await expect(page.getByRole("heading", { name: "Kanban Studio" })).toBeVisible();
   await expect(page.locator('[data-testid^="column-"]')).toHaveCount(5);
 });
 
 test("adds a card to a column", async ({ page }) => {
   await page.goto("/");
+  await page.waitForSelector('[data-testid^="column-"]', { timeout: 30000 });
   const firstColumn = page.locator('[data-testid^="column-"]').first();
   await firstColumn.getByRole("button", { name: /add a card/i }).click();
   await firstColumn.getByPlaceholder("Card title").fill("Playwright card");
@@ -18,24 +20,19 @@ test("adds a card to a column", async ({ page }) => {
 
 test("moves a card between columns", async ({ page }) => {
   await page.goto("/");
-  const card = page.getByTestId("card-card-1");
-  const targetColumn = page.getByTestId("column-col-review");
-  const cardBox = await card.boundingBox();
-  const columnBox = await targetColumn.boundingBox();
-  if (!cardBox || !columnBox) {
-    throw new Error("Unable to resolve drag coordinates.");
-  }
+  await page.waitForSelector('[data-testid="card-card-1"]', { timeout: 30000 });
 
-  await page.mouse.move(
-    cardBox.x + cardBox.width / 2,
-    cardBox.y + cardBox.height / 2
-  );
-  await page.mouse.down();
-  await page.mouse.move(
-    columnBox.x + columnBox.width / 2,
-    columnBox.y + 120,
-    { steps: 12 }
-  );
-  await page.mouse.up();
-  await expect(targetColumn.getByTestId("card-card-1")).toBeVisible();
+  const moveRightInColumn = (columnId: string) =>
+    page.getByTestId(columnId).getByTestId("card-card-1").getByRole("button", {
+      name: /Move .* right/i,
+    });
+
+  await moveRightInColumn("column-col-backlog").click();
+  await expect(page.getByTestId("column-col-discovery").getByTestId("card-card-1")).toBeVisible();
+
+  await moveRightInColumn("column-col-discovery").click();
+  await expect(page.getByTestId("column-col-progress").getByTestId("card-card-1")).toBeVisible();
+
+  await moveRightInColumn("column-col-progress").click();
+  await expect(page.getByTestId("column-col-review").getByTestId("card-card-1")).toBeVisible();
 });

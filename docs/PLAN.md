@@ -2,36 +2,148 @@
 
 Part 1: Plan
 
-Enrich this document to plan out each of these parts in detail, with substeps listed out as a checklist to be checked off by the agent, and with tests and success critieria for each. Also create an AGENTS.md file inside the frontend directory that describes the existing code there. Ensure the user checks and approves the plan.
+- Create and confirm project-level AGENTS.md and frontend/AGENTS.md.
+- Review existing frontend MVP code and existing tests.
+- Add explicit checklist and success criteria per part.
+- Confirm with user before proceeding.
 
-Part 2: Scaffolding
+Success criteria:
+- `docs/PLAN.md` and `frontend/AGENTS.md` exist and are approved.
+- high-level tasks are split into subtasks with OKRs.
+- user gives go-ahead to move to Part 2.
 
-Set up the Docker infrastructure, the backend in backend/ with FastAPI, and write the start and stop scripts in the scripts/ directory. This should serve example static HTML to confirm that a 'hello world' example works running locally and also make an API call.
+Part 2: Scaffolding (Docker + FastAPI + hello world)
 
-Part 3: Add in Frontend
+- Create `Dockerfile` and `docker-compose.yml` in root.
+- Add backend dependencies: `fastapi`, `uvicorn`, `databases`, `sqlalchemy` (as needed), `python-dotenv`, `httpx`.
+- Implement backend structure in `backend/app.py` with:
+  - GET `/` returning simple HTML "hello world"
+  - GET `/api/ping` returning JSON `{status: "ok", time: ...}`
+- Add start/stop scripts:
+  - `scripts/start.ps1`, `scripts/stop.ps1`, `scripts/start.sh`, `scripts/stop.sh`.
+- Validate container startup and route response.
+- Add smoke test script in `backend/test_smoke.py` to call `/api/ping`.
 
-Now update so that the frontend is statically built and served, so that the app has the demo Kanban board displayed at /. Comprehensive unit and integration tests.
+Success criteria:
+- `docker-compose up --build` starts both backend and static site container.
+- `/api/ping` responds with 200 and JSON payload.
+- `scripts/start*` and `scripts/stop*` work.
+- a CI task can run backend smoke test.
 
-Part 4: Add in a fake user sign in experience
+Part 3: Add in Frontend static build and serve
 
-Now update so that on first hitting /, you need to log in with dummy credentials ("user", "password") in order to see the Kanban, and you can log out. Comprehensive tests.
+- Integrate existing frontend into full deployment:
+  - Build Next.js output to `frontend/.next` and static export if needed.
+  - Backend serves frontend by mounting static files or reverse proxy.
+- Ensure root route `/` serves the app, showing current Kanban demo.
+- Add test targets:
+  - `npm test`, `npm run lint`, and `npm run build` from frontend.
+  - integration test hitting `/` and verifying expected DOM text.
+
+Success criteria:
+- `docker-compose up --build` exposes app at `/` with Kanban.
+- frontend tests pass in local run.
+
+Part 4: Fake sign-in experience
+
+- Add auth in frontend only with state + localStorage:
+  - page shows login form when not signed in.
+  - checking hardcoded credentials `user` / `password`.
+  - on success, show board + sign-out button.
+- Keep backend unchanged (API open for now).
+- Add end-to-end tests for login flow, logout, invalid credentials.
+
+Success criteria:
+- login with correct creds shows board.
+- invalid login shows error message.
+- logout returns to login screen.
 
 Part 5: Database modeling
 
-Now propose a database schema for the Kanban, saving it as JSON. Document the database approach in docs/ and get user sign off.
+- Define schema:
+  - users: id, username, password_hash, created_at
+  - boards: id, user_id, data_json, updated_at
+  - board_updates (optional): id, board_id, diff_json, created_at
+- Pick SQLite local file `data/kanban.db`.
+- Add docs in `docs/DB_SCHEMA.md` and update `docs/PLAN.md`.
+- Write unit tests validating ORM models and JSON save/load.
 
-Part 6: Backend
+Success criteria:
+- DB schema file exists.
+- migrations or create-if-not-exist are implemented.
+- tests verify row insert and kanban JSON retrieval.
 
-Now add API routes to allow the backend to read and change the Kanban for a given user; test this thoroughly with backend unit tests. The database should be created if it doesn't exist.
+Part 6: Backend API
 
-Part 7: Frontend + Backend
+- Implement backend endpoints:
+  - GET `/api/kanban` (user from basic auth header session cookie for MVP non-secure; can use query string user='user').
+  - POST `/api/kanban` with JSON payload to update board.
+  - GET `/api/health` and `/api/ping`.
+- Use SQLite with ORM or raw queries.
+- Add tests: backend fastapi test client for endpoints.
 
-Now have the frontend actually use the backend API, so that the app is a proper persistent Kanban board. Test very throughly.
+Success criteria:
+- GET `/api/kanban` returns canonical board JSON.
+- POST updates persisted board.
+
+Part 7: Frontend + Backend integration
+
+- Replace frontend local state with backend calls:
+  - load board via `/api/kanban` after login.
+  - on card move/edit/create send updates to POST `/api/kanban`.
+- Add optimistic UI updates and revert errors.
+- Add full integration tests for API flow (Playwright or Vitest with mock server).
+
+Success criteria:
+- board persistence between reloads.
+- drag/drop and edit operations persist.
 
 Part 8: AI connectivity
 
-Now allow the backend to make an AI call via OpenRouter. Test connectivity with a simple "2+2" test and ensure the AI call is working.
+- Add backend AI service component using OpenRouter API key.
+- Route: POST `/api/ai/ping` calls OpenRouter to evaluate prompt "2+2".
+- Accept env var `OPENROUTER_API_KEY`.
+- Add tests with mocking (pytest + respx) and real optional integration.
 
-Part 9: Now extend the backend call so that it always calls the AI with the JSON of the Kanban board, plus the user's question (and conversation history). The AI should respond with Structured Outputs that includes the response to the user and optionaly an update to the Kanban. Test thoroughly.
+Success criteria:
+- AI route returns a valid response.
+- tests cover 2+2 call.
 
-Part 10: Now add a beautiful sidebar widget to the UI supporting full AI chat, and allowing the LLM (as it determines) to update the Kanban based on its Structured Outputs. If the AI updates the Kanban, then the UI should refresh automatically.
+Part 9: AI structured board updates
+
+- Add route POST `/api/ai/kanban` with body containing
+  - `user_message`.
+  - `board_state`.
+  - optionally `conversation_history`.
+- Server sends request to OpenRouter with full context.
+- LLM response parser returns:
+  - `text_response`
+  - `board_update` nullable (change set or full board JSON)
+- If provided, backend applies update and persists.
+- Response includes both text and updated board state.
+- Add tests for parser and route.
+
+Success criteria:
+- backend applies AI updates correctly when returned.
+- if no update, board unchanged.
+
+Part 10: UI AI chat widget
+
+- Add sidebar chat UI:
+  - messages list
+  - input box
+  - “send” button
+  - history tracking.
+- On send, call `/api/ai/kanban`.
+- Render text from AI and apply board updates.
+- Add tests on UI and API interactions.
+
+Success criteria:
+- chat can ask questions and AI responses appear.
+- if AI returns updates, board UI refreshes.
+
+## General test strategy
+
+- Unit tests in `frontend/src/**/*.{test.tsx,test.ts}` and `backend/tests`.
+- Integration tests via Playwright in `tests/` for key flows.
+- CI should run `npm ci`, `npm test` and Python test suite, and container smoke tests.

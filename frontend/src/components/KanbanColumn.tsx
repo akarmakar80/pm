@@ -11,6 +11,8 @@ type KanbanColumnProps = {
   onRename: (columnId: string, title: string) => void;
   onAddCard: (columnId: string, title: string, details: string) => void;
   onDeleteCard: (columnId: string, cardId: string) => void;
+  onMoveLeft?: (columnId: string, cardId: string) => void;
+  onMoveRight?: (columnId: string, cardId: string) => void;
 };
 
 export const KanbanColumn = ({
@@ -54,6 +56,8 @@ export const KanbanColumn = ({
               key={card.id}
               card={card}
               onDelete={(cardId) => onDeleteCard(column.id, cardId)}
+              onMoveLeft={(cardId) => onMoveLeft?.(column.id, cardId)}
+              onMoveRight={(cardId) => onMoveRight?.(column.id, cardId)}
             />
           ))}
         </SortableContext>
