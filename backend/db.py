@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import datetime
+from datetime import datetime, UTC
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -8,11 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent
 
 def get_db_path():
     return os.getenv("KANBAN_DB_PATH", str(BASE_DIR.parent / "data" / "kanban.db"))
-
-
-# Ensure data folder exists for default path
-default_db = get_db_path()
-(Path(default_db).parent).mkdir(parents=True, exist_ok=True)
 
 
 def get_connection():
@@ -67,7 +62,7 @@ def init_db():
 
 
 def create_user(username: str, password_hash: str):
-    created_at = datetime.utcnow().isoformat() + "Z"
+    created_at = datetime.now(UTC).isoformat()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -81,7 +76,7 @@ def create_user(username: str, password_hash: str):
 
 
 def create_board(user_id: int, data_json: str):
-    updated_at = datetime.utcnow().isoformat() + "Z"
+    updated_at = datetime.now(UTC).isoformat()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -95,7 +90,7 @@ def create_board(user_id: int, data_json: str):
 
 
 def add_board_update(board_id: int, diff_json: str):
-    created_at = datetime.utcnow().isoformat() + "Z"
+    created_at = datetime.now(UTC).isoformat()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -136,7 +131,7 @@ def get_board_by_user(user_id: int):
 
 
 def update_board(board_id: int, data_json: str):
-    updated_at = datetime.utcnow().isoformat() + "Z"
+    updated_at = datetime.now(UTC).isoformat()
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(

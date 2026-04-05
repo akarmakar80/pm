@@ -10,10 +10,13 @@ services:
   backend:
     build: .
     container_name: pm_backend
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     environment:
       - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data:/app/data
     depends_on:
       - frontend
-

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash scripts/start.sh)",
+      "Bash(docker-compose up:*)",
+      "Bash(curl -s http://localhost:8000/api/ping)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python backend/test_smoke.py)",
+      "Bash(npm run:*)",
+      "Bash(git -C \"/c/Users/anupa/Documents/AK/AI Coder/projects/pm\" ls-files .env)",
+      "Bash(bash scripts/stop.sh)"
+    ]
+  }
+}

@@ -50,19 +50,7 @@ export default function AuthPage() {
   }
 
   if (isAuthenticated) {
-    return (
-      <div className="relative min-h-screen bg-slate-50 p-6">
-        <div className="fixed right-4 top-4 z-10">
-          <button
-            onClick={handleLogout}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-          >
-            Logout
-          </button>
-        </div>
-        <KanbanBoard />
-      </div>
-    );
+    return <KanbanBoard user={username} onLogout={handleLogout} />;
   }
 
   return (

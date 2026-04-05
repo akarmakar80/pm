@@ -60,10 +60,38 @@ def test_ai_ping_no_key(monkeypatch):
     assert resp.json()["value"] == 4
 
 
-def test_ai_kanban_add_card():
+def test_ai_kanban_no_key(monkeypatch):
+    monkeypatch.setenv("OPENROUTER_API_KEY", "")
     initial = client.get("/api/kanban?user=testuser").json()
     resp = client.post("/api/ai/kanban", json={"user": "testuser", "user_message": "Add card", "board_state": initial})
+    assert resp.status_code == 503
+
+
+def test_ai_kanban_with_key(monkeypatch):
+    from unittest.mock import patch, MagicMock
+    import json as _json
+
+    monkeypatch.setenv("OPENROUTER_API_KEY", "test-key")
+    initial = client.get("/api/kanban?user=testuser").json()
+
+    mock_resp = MagicMock()
+    mock_resp.raise_for_status = MagicMock()
+    mock_resp.json.return_value = {
+        "choices": [{"message": {"content": _json.dumps({
+            "text_response": "Here are your tasks.",
+            "board_update": None,
+        })}}]
+    }
+
+    with patch("httpx.post", return_value=mock_resp):
+        resp = client.post("/api/ai/kanban", json={
+            "user": "testuser",
+            "user_message": "What are my current tasks?",
+            "board_state": initial,
+        })
+
     assert resp.status_code == 200
     body = resp.json()
     assert body["status"] == "ok"
-    assert body["board_update"] is not None
+    assert body["text_response"] == "Here are your tasks."
+    assert body["board_update"] is None

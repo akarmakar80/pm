@@ -21,35 +21,38 @@ export const KanbanColumn = ({
   onRename,
   onAddCard,
   onDeleteCard,
+  onMoveLeft,
+  onMoveRight,
 }: KanbanColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: column.id });
 
   return (
-    <section
-      ref={setNodeRef}
+    <div
       className={clsx(
-        "flex min-h-[520px] flex-col rounded-3xl border border-[var(--stroke)] bg-[var(--surface-strong)] p-4 shadow-[var(--shadow)] transition",
-        isOver && "ring-2 ring-[var(--accent-yellow)]"
+        "flex flex-col h-full rounded-xl border bg-white transition",
+        isOver ? "ring-2 ring-[var(--accent-yellow)]" : "border-[var(--stroke)]"
       )}
+      style={{ boxShadow: "0 2px 8px rgba(3,33,71,0.06)" }}
       data-testid={`column-${column.id}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="w-full">
-          <div className="flex items-center gap-3">
-            <div className="h-2 w-10 rounded-full bg-[var(--accent-yellow)]" />
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
-              {cards.length} cards
-            </span>
-          </div>
+      {/* Column header */}
+      <div className="flex-none px-4 pt-4 pb-3 border-b border-[var(--stroke)]">
+        <div className="h-1 w-8 rounded-full mb-3" style={{ background: "var(--accent-yellow)" }} />
+        <div className="flex items-center justify-between gap-2">
           <input
             value={column.title}
-            onChange={(event) => onRename(column.id, event.target.value)}
-            className="mt-3 w-full bg-transparent font-display text-lg font-semibold text-[var(--navy-dark)] outline-none"
+            onChange={(e) => onRename(column.id, e.target.value)}
+            className="flex-1 bg-transparent font-display font-semibold text-sm text-[var(--navy-dark)] outline-none min-w-0"
             aria-label="Column title"
           />
+          <span className="flex-none text-xs font-semibold tabular-nums px-2 py-0.5 rounded-full bg-slate-100 text-[var(--gray-text)]">
+            {cards.length}
+          </span>
         </div>
       </div>
-      <div className="mt-4 flex flex-1 flex-col gap-3">
+
+      {/* Cards — scrollable */}
+      <div ref={setNodeRef} className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2 min-h-0">
         <SortableContext items={column.cardIds} strategy={verticalListSortingStrategy}>
           {cards.map((card) => (
             <KanbanCard
@@ -62,14 +65,16 @@ export const KanbanColumn = ({
           ))}
         </SortableContext>
         {cards.length === 0 && (
-          <div className="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-[var(--stroke)] px-3 py-6 text-center text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
-            Drop a card here
+          <div className="flex-1 flex items-center justify-center rounded-lg border border-dashed border-[var(--stroke)] text-xs text-[var(--gray-text)] py-8">
+            Drop here
           </div>
         )}
       </div>
-      <NewCardForm
-        onAdd={(title, details) => onAddCard(column.id, title, details)}
-      />
-    </section>
+
+      {/* Add card */}
+      <div className="flex-none border-t border-[var(--stroke)] px-3 pt-3 pb-3">
+        <NewCardForm onAdd={(title, details) => onAddCard(column.id, title, details)} />
+      </div>
+    </div>
   );
 };
