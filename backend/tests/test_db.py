@@ -27,7 +27,7 @@ def test_db_schema_and_insert_and_retrieve():
     board_json = json.dumps({'columns': []})
     board_id = db.create_board(user_id, board_json)
 
-    loaded_board = db.get_board(board_id)
+    loaded_board = db.get_board_by_user(user_id)
     assert loaded_board is not None
     assert loaded_board['user_id'] == user_id
     assert loaded_board['data_json'] == board_json

@@ -11,14 +11,13 @@ def get_db_path():
 
 
 def get_connection():
-    db_path = get_db_path()
-    (Path(db_path).parent).mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
+    conn = sqlite3.connect(get_db_path(), detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db():
+    Path(get_db_path()).parent.mkdir(parents=True, exist_ok=True)
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -101,15 +100,6 @@ def add_board_update(board_id: int, diff_json: str):
     conn.commit()
     conn.close()
     return update_id
-
-
-def get_board(board_id: int):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM boards WHERE id = ?", (board_id,))
-    row = cursor.fetchone()
-    conn.close()
-    return row
 
 
 def get_user(username: str):

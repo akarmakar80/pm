@@ -15,28 +15,6 @@ export type BoardData = {
   cards: Record<string, Card>;
 };
 
-export const initialData: BoardData = {
-  columns: [
-    { id: "col-backlog", title: "Backlog", cardIds: ["card-1", "card-2"] },
-    { id: "col-in-progress", title: "In Progress", cardIds: [] },
-    { id: "col-review", title: "Review", cardIds: [] },
-    { id: "col-done", title: "Done", cardIds: [] },
-    { id: "col-blocked", title: "Blocked", cardIds: [] },
-  ],
-  cards: {
-    "card-1": {
-      id: "card-1",
-      title: "Set up project",
-      details: "Initialize files and repo.",
-    },
-    "card-2": {
-      id: "card-2",
-      title: "Create baseline UI",
-      details: "Add Kanban board components.",
-    },
-  },
-};
-
 const isColumnId = (columns: Column[], id: string) =>
   columns.some((column) => column.id === id);
 

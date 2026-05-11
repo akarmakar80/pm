@@ -13,20 +13,15 @@ export default function AuthPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const saved = typeof window.localStorage?.getItem === "function"
-      ? window.localStorage.getItem(STORAGE_KEY)
-      : null;
-    setIsAuthenticated(saved === "true");
+    setIsAuthenticated(localStorage.getItem(STORAGE_KEY) === "true");
     setIsReady(true);
   }, []);
 
   const setLoggedIn = (state: boolean) => {
-    if (typeof window.localStorage?.setItem === "function") {
-      if (state) {
-        window.localStorage.setItem(STORAGE_KEY, "true");
-      } else {
-        window.localStorage.removeItem(STORAGE_KEY);
-      }
+    if (state) {
+      localStorage.setItem(STORAGE_KEY, "true");
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
     }
     setIsAuthenticated(state);
   };

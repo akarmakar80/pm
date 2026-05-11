@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -70,12 +70,7 @@ export const KanbanBoard = ({ user = "user", onLogout }: KanbanBoardProps) => {
     });
   };
 
-  const syncBoard = (nextBoard: BoardData) => {
-    setBoard(nextBoard);
-    saveBoard(nextBoard);
-  };
-
-  const cardsById = useMemo(() => board?.cards ?? {}, [board?.cards]);
+  const syncBoard = (nextBoard: BoardData) => setAndSave(() => nextBoard);
 
   const handleDragStart = (event: DragStartEvent) => setActiveCardId(event.active.id as string);
 
@@ -100,7 +95,7 @@ export const KanbanBoard = ({ user = "user", onLogout }: KanbanBoardProps) => {
     const id = createId("card");
     setAndSave((prev) => ({
       ...prev,
-      cards: { ...prev.cards, [id]: { id, title, details: details || "No details yet." } },
+      cards: { ...prev.cards, [id]: { id, title, details } },
       columns: prev.columns.map((col) =>
         col.id === columnId ? { ...col, cardIds: [...col.cardIds, id] } : col
       ),
@@ -144,7 +139,7 @@ export const KanbanBoard = ({ user = "user", onLogout }: KanbanBoardProps) => {
     if (idx < board.columns.length - 1) moveCardToColumn(cardId, columnId, board.columns[idx + 1].id);
   };
 
-  const activeCard = activeCardId ? cardsById[activeCardId] : null;
+  const activeCard = activeCardId ? board?.cards[activeCardId] ?? null : null;
 
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: "var(--surface)" }}>

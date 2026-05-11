@@ -1,5 +1,6 @@
 import os
 import json
+import sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime, UTC
 import httpx
@@ -34,11 +35,26 @@ class AiKanbanRequest(BaseModel):
     board_state: dict
 
 
+def _openrouter_post(messages: list, timeout: int = 30) -> httpx.Response:
+    key = os.getenv("OPENROUTER_API_KEY")
+    resp = httpx.post(
+        OPENROUTER_API_URL,
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        json={"model": AI_MODEL, "messages": messages},
+        timeout=timeout,
+    )
+    resp.raise_for_status()
+    return resp
+
+
 def _get_or_create_user(username: str) -> int:
     existing = db.get_user(username)
     if existing is not None:
         return existing["id"]
-    return db.create_user(username, "password-hash-placeholder")
+    try:
+        return db.create_user(username, "password-hash-placeholder")
+    except sqlite3.IntegrityError:
+        return db.get_user(username)["id"]
 
 
 def _save_board(user_id: int, board: dict) -> int:
@@ -95,21 +111,14 @@ def post_kanban(payload: KanbanSaveRequest):
 
 @app.get("/api/ai/ping")
 def ai_ping():
-    key = os.getenv("OPENROUTER_API_KEY")
-    if not key:
+    if not os.getenv("OPENROUTER_API_KEY"):
         return {"status": "ok", "value": 4, "note": "no key, local fallback"}
 
     try:
-        resp = httpx.post(
-            OPENROUTER_API_URL,
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={
-                "model": AI_MODEL,
-                "messages": [{"role": "user", "content": "What is 2 + 2? Reply with just the number."}],
-            },
+        resp = _openrouter_post(
+            [{"role": "user", "content": "What is 2 + 2? Reply with just the number."}],
             timeout=20,
         )
-        resp.raise_for_status()
         content = resp.json().get("choices", [{}])[0].get("message", {}).get("content", "")
         return {"status": "ok", "value": content}
     except Exception as e:
@@ -118,9 +127,7 @@ def ai_ping():
 
 @app.post("/api/ai/kanban")
 def ai_kanban(request_data: AiKanbanRequest):
-    key = os.getenv("OPENROUTER_API_KEY")
-
-    if not key:
+    if not os.getenv("OPENROUTER_API_KEY"):
         return JSONResponse({"detail": "OPENROUTER_API_KEY not set"}, status_code=503)
 
     system_prompt = (
@@ -143,13 +150,7 @@ def ai_kanban(request_data: AiKanbanRequest):
     ]
 
     try:
-        resp = httpx.post(
-            OPENROUTER_API_URL,
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={"model": AI_MODEL, "messages": messages},
-            timeout=30,
-        )
-        resp.raise_for_status()
+        resp = _openrouter_post(messages)
         content = resp.json()["choices"][0]["message"]["content"]
     except Exception as e:
         return JSONResponse({"detail": str(e)}, status_code=500)
