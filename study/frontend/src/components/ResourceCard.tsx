@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { formatDuration, post, type Resource } from "@/lib/api";
 
 const TYPE_LABEL: Record<Resource["type"], string> = {
@@ -10,12 +11,13 @@ const TYPE_LABEL: Record<Resource["type"], string> = {
   article: "Article",
 };
 
-export default function ResourceCard({ item, onReported }: { item: Resource; onReported: () => void }) {
-  async function report() {
-    const note = window.prompt("What is wrong with this item? (broken link, wrong topic, mistake...)");
-    if (note === null) return;
-    await post(`/api/resources/${item.id}/report`, { note });
-    onReported();
+export default function ResourceCard({ item, onChange }: { item: Resource; onChange: () => void }) {
+  const [rating, setRating] = useState(item.rating);
+
+  async function rate(helpful: boolean) {
+    await post(`/api/resources/${item.id}/rating`, { helpful });
+    setRating(helpful ? 1 : -1);
+    if (!helpful) onChange();
   }
 
   return (
@@ -33,11 +35,7 @@ export default function ResourceCard({ item, onReported }: { item: Resource; onR
       )}
       <div className="space-y-2 p-4">
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className={`rounded-full px-2 py-0.5 font-medium ${
-            item.tier === 3 ? "bg-ok/15 text-ok" : "bg-brand/10 text-brand"
-          }`}>
-            {item.badge}
-          </span>
+          <span className="rounded-full bg-brand/10 px-2 py-0.5 font-medium text-brand">{item.provider}</span>
           <span className="text-muted">{TYPE_LABEL[item.type]}</span>
           {item.duration_sec && <span className="text-muted">{formatDuration(item.duration_sec)}</span>}
         </div>
@@ -48,7 +46,6 @@ export default function ResourceCard({ item, onReported }: { item: Resource; onR
             {item.title}
           </a>
         )}
-        {item.recommendation && <p className="text-sm italic text-muted">&ldquo;{item.recommendation}&rdquo;</p>}
         {item.platform?.login_url && (
           <p className="flex flex-wrap items-center gap-2 rounded-md bg-accent/15 px-3 py-2 text-xs">
             <span>{item.platform.note}.</span>
@@ -57,9 +54,14 @@ export default function ResourceCard({ item, onReported }: { item: Resource; onR
             </a>
           </p>
         )}
-        <button onClick={report} className="text-xs text-muted hover:text-warn">
-          Report a problem
-        </button>
+        <div className="flex items-center gap-3 text-xs text-muted">
+          <span>Was this useful?</span>
+          <button onClick={() => rate(true)} aria-pressed={rating === 1}
+            className={rating === 1 ? "font-semibold text-ok" : "hover:text-ok"}>
+            {rating === 1 ? "Helpful (saved)" : "Helpful"}
+          </button>
+          <button onClick={() => rate(false)} className="hover:text-warn">Not helpful - hide it</button>
+        </div>
       </div>
     </article>
   );

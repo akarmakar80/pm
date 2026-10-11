@@ -1,11 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-
-export type Role = "student" | "educator" | "parent";
-
-export type User = { id: number; username: string; name: string; role: Role };
 
 export type TopicSummary = {
   id: number;
@@ -21,25 +16,58 @@ export type TopicSummary = {
 export type Purpose = "concept" | "examples" | "application" | "reference";
 export type ResourceType = "video" | "pdf" | "simulation" | "course" | "article";
 
-export type Platform = { id?: number; name: string; domain: string; login_url: string | null; note: string };
+export type Platform = { name: string; domain: string; login_url: string | null; note: string };
 
 export type Resource = {
   id: number;
+  provider: string;
   type: ResourceType;
   title: string;
   url: string;
   video_id: string | null;
   duration_sec: number | null;
   purpose: Purpose;
-  source_name: string;
-  badge: string;
-  tier: number;
-  recommendation: string | null;
+  rating: 1 | -1 | null;
   platform: Platform | null;
 };
 
 export type TopicPack = TopicSummary & {
+  videos_enabled: boolean;
   tabs: { learn: Resource[]; explore: Resource[]; read: Resource[]; practice: Resource[] };
+};
+
+export type QuizQuestion = {
+  id: number;
+  topic_id: number;
+  question: string;
+  options: string[];
+  answer_index?: number;
+  explanation?: string;
+  chosen_index?: number | null;
+  correct?: boolean;
+  flagged?: boolean;
+};
+
+export type Quiz = {
+  id: number;
+  kind: "topic" | "chapter" | "mistakes";
+  title: string;
+  topic_id: number | null;
+  chapter_id: number | null;
+  time_limit_sec: number | null;
+  created_at: string;
+  submitted_at: string | null;
+  score: number | null;
+  total: number;
+  confidence: number | null;
+  questions: QuizQuestion[];
+};
+
+export type Progress = {
+  topics: (TopicSummary & { answered: number; correct: number; accuracy: number; last_practiced: string })[];
+  weak: (TopicSummary & { answered: number; correct: number; accuracy: number })[];
+  quizzes: Omit<Quiz, "questions" | "time_limit_sec" | "created_at">[];
+  mistakes: number;
 };
 
 export type SearchResult = {
@@ -73,9 +101,8 @@ export function post<T>(path: string, body: unknown = {}): Promise<T> {
   return api<T>(path, { method: "POST", body: JSON.stringify(body) });
 }
 
-/** Fetch JSON for a component. `reload` re-runs the request. Signed-out users go to /login. */
+/** Fetch JSON for a component. `reload` re-runs the request. */
 export function useApi<T>(path: string | null) {
-  const router = useRouter();
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
@@ -85,14 +112,11 @@ export function useApi<T>(path: string | null) {
     let active = true;
     api<T>(path)
       .then((d) => active && (setData(d), setError(null)))
-      .catch((e: ApiError) => {
-        if (e.status === 401) router.replace("/login");
-        else if (active) setError(e.message);
-      });
+      .catch((e: ApiError) => active && setError(e.message));
     return () => {
       active = false;
     };
-  }, [path, version, router]);
+  }, [path, version]);
 
   const reload = useCallback(() => setVersion((v) => v + 1), []);
   return { data, error, reload };

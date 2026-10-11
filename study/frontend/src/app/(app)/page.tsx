@@ -2,25 +2,21 @@
 
 import Link from "next/link";
 import SearchBox from "@/components/SearchBox";
-import { useUser } from "@/components/Shell";
 import TopicCard from "@/components/TopicCard";
-import { useApi, type LibraryEntry } from "@/lib/api";
+import { useApi, type LibraryEntry, type Progress } from "@/lib/api";
 
 type Subject = { code: string; name: string; chapters: number };
 
 export default function Dashboard() {
-  const user = useUser();
   const { data: library } = useApi<LibraryEntry[]>("/api/library");
   const { data: subjects } = useApi<Subject[]>("/api/subjects");
+  const { data: progress } = useApi<Progress>("/api/progress");
 
   return (
     <div className="space-y-10">
       <section className="space-y-3">
-        <h1 className="font-display text-2xl font-semibold">Hi {user.name}, what do you want to study today?</h1>
+        <h1 className="font-display text-2xl font-semibold">What do you want to study today?</h1>
         <SearchBox large />
-        <p className="text-sm text-muted">
-          Everything shown comes from NCERT, CBSE, trusted learning platforms, or has been checked by an educator.
-        </p>
       </section>
 
       {library && library.length > 0 && (
@@ -31,6 +27,17 @@ export default function Dashboard() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {library.slice(0, 4).map((t) => <TopicCard key={t.id} topic={t} />)}
+          </div>
+        </section>
+      )}
+
+      {progress && progress.weak.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-display text-lg font-semibold">Topics to revise</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {progress.weak.slice(0, 4).map((t) => (
+              <TopicCard key={t.id} topic={t} note={`${Math.round(t.accuracy * 100)}% correct in quizzes`} />
+            ))}
           </div>
         </section>
       )}

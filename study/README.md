@@ -1,19 +1,18 @@
 # Study Hub
 
-A study website for a CBSE Class 10 student. The student types a topic, the site maps it to the
-syllabus and shows a Topic Pack (Learn / Explore / Read / Practice) built only from verified sources.
-Every opened topic is saved in My Library. Design: `docs/CBSE_STUDY_PLATFORM_PLAN.md`.
+A study website for a CBSE Class 10 student. Type a topic, and the site shows videos, simulations,
+the NCERT chapter and practice for it. Every opened topic is saved in My Library.
+Design: `docs/CBSE_STUDY_PLATFORM_PLAN.md`.
 
 ## Run with Docker
 
 ```bash
-cp .env.example .env      # set passwords and, optionally, YOUTUBE_API_KEY
+cp .env.example .env      # add YOUTUBE_API_KEY and OPENROUTER_API_KEY
 scripts/start.sh          # or scripts/start.ps1 on Windows; open http://localhost:3000
 scripts/stop.sh
 ```
 
-Accounts: `student`, `parent`, `educator`. Passwords come from `.env` when the database is first
-created (default: same as the username). Data is stored in `data/study.db`.
+There is no login. Data is stored in `data/study.db`.
 
 ## Local development
 
@@ -25,26 +24,30 @@ cd backend && uv venv && uv pip install -r requirements.txt
 cd frontend && npm ci && npm run dev   # proxies /api to localhost:8000
 ```
 
-## How content is verified
+## How it works
 
-- Tier 1 (NCERT, CBSE, official channels) and tier 2 (Khan Academy, PhET) are shown immediately.
-- Videos from allow-listed YouTube channels are indexed nightly and wait in Review until an educator
-  scores them on the rubric (every score 3 or higher to approve).
-- Educators can also add resources directly; their name and recommendation appear on the card.
-- A student "Report a problem" hides the item until it is reviewed again.
-- Links can only come from the allowed sites list (`backend/seed/platforms.json`, extended by a parent
-  under Review > Sites). Sites that need an account show a "Sign in" link; the student signs in on the
-  site itself and Study Hub never stores those passwords.
+- **Videos**: the first time a topic is opened, YouTube is searched once (Education category,
+  SafeSearch strict). Age-restricted, non-embeddable, very short, other-class and blocked-word videos
+  are dropped; the rest are ranked by views, engagement, length, recency and known CBSE channels.
+  Results are saved, so later visits are instant. "Find more videos" searches again.
+- **Other material**: NCERT chapter PDFs, PhET simulations and Khan Academy are built in.
+  Sites that need an account show a "Sign in" link (see Learning sites).
+- **Practice**: topic quizzes (5 questions), timed chapter tests (10 questions, 10 minutes) and a
+  "practise my mistakes" quiz. Questions are written by an LLM via OpenRouter the first time they are
+  needed, saved, and reused. Answers and explanations are shown after submitting.
+- **Feedback**: Helpful / Not helpful on every item (not helpful hides it), "Report this question"
+  (never used again), and a confidence rating after each quiz. The Progress page shows accuracy per
+  topic, topics to revise and quiz history.
 - Syllabus data is in `backend/seed/syllabus.json` (2025-26). Check it against the CBSE curriculum
   each year.
 
 ## Keeping content safe
 
-- Nothing from the open web is shown: every item comes from an allowed site and passes review.
-- YouTube videos that are age-restricted, cannot be embedded, or whose title/description contains a
-  blocked term (`backend/seed/blocked_terms.txt`) are never indexed or accepted.
-- Searches containing blocked terms return nothing and are flagged to the parent under Review > Searches.
+- YouTube search uses SafeSearch strict and the Education category only.
+- Age-restricted videos and anything with a blocked term (`backend/seed/blocked_terms.txt`) in the
+  title or description are never shown. Searches with blocked terms return nothing.
 - Only YouTube's privacy-mode player can be embedded (Content-Security-Policy `frame-src`).
+- AI-written questions can contain mistakes; reported questions are removed.
 - External sites open in a new tab and are outside Study Hub's control. Also turn on device-level
   protection: Google Family Link or Microsoft Family Safety, YouTube Restricted Mode, and a family DNS
   filter on the home router (for example Cloudflare 1.1.1.3 or OpenDNS FamilyShield).

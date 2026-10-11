@@ -1,5 +1,16 @@
 # CBSE Class 10 Study Platform - Technical Plan and Architecture
 
+> **Current scope (supersedes the sections below where they differ).** The app was simplified:
+> - One user, no login. The parent and educator roles, the review queue and the trust tiers are removed.
+> - Videos are shown immediately: the first time a topic is opened, YouTube is searched (Education
+>   category, SafeSearch strict) and safety filters drop age-restricted, non-embeddable, other-class and
+>   blocked-word videos. Results are ranked and saved.
+> - Practice: topic quizzes, timed chapter tests and a mistakes quiz, using multiple-choice questions
+>   written by an LLM (OpenRouter) on first use and cached.
+> - Feedback: Helpful / Not helpful on items, "Report this question", a confidence rating after each
+>   quiz, and a Progress page (accuracy per topic, topics to revise, history).
+> - Not built: CBSE sample papers and PYQs, subjective answers, flashcards, English and Hindi.
+
 ## 1. Goals
 
 A private website for one Class 10 CBSE student, with a parent and one or more educators as reviewers, that:

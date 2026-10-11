@@ -37,8 +37,7 @@ function Results() {
           <h1 className="font-display text-xl font-semibold">No Class 10 topic found for &ldquo;{q}&rdquo;</h1>
           <p className="mt-2 text-muted">
             This may not be part of the current CBSE Class 10 syllabus, or it may be called something else.
-            Try the chapter name or a key term from your textbook. Your parent can see this search and add the
-            topic if it is needed.
+            Try the chapter name or a key term from your textbook.
           </p>
         </section>
       )}

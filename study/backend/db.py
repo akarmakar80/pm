@@ -4,24 +4,10 @@ import sqlite3
 from pathlib import Path
 from urllib.parse import urlparse
 
-from auth import hash_password
-
 BASE_DIR = Path(__file__).resolve().parent
 SEED_DIR = BASE_DIR / "seed"
 
 SCHEMA = """
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
-    name TEXT NOT NULL,
-    role TEXT NOT NULL CHECK (role IN ('student', 'educator', 'parent')),
-    password_hash TEXT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS sessions (
-    token TEXT PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
 CREATE TABLE IF NOT EXISTS subjects (
     id INTEGER PRIMARY KEY,
     code TEXT UNIQUE NOT NULL,
@@ -41,32 +27,22 @@ CREATE TABLE IF NOT EXISTS topics (
     chapter_id INTEGER NOT NULL REFERENCES chapters(id),
     position INTEGER NOT NULL,
     title TEXT NOT NULL,
-    keywords TEXT NOT NULL DEFAULT ''
+    keywords TEXT NOT NULL DEFAULT '',
+    videos_fetched_at TEXT
 );
 CREATE VIRTUAL TABLE IF NOT EXISTS topics_fts USING fts5(
     title, keywords, chapter, content='', tokenize='porter unicode61'
 );
-CREATE TABLE IF NOT EXISTS sources (
-    id INTEGER PRIMARY KEY,
-    kind TEXT NOT NULL,
-    name TEXT NOT NULL,
-    external_id TEXT,
-    tier INTEGER NOT NULL CHECK (tier BETWEEN 1 AND 3),
-    approved_by INTEGER REFERENCES users(id),
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (kind, external_id)
-);
 CREATE TABLE IF NOT EXISTS resources (
     id INTEGER PRIMARY KEY,
-    source_id INTEGER NOT NULL REFERENCES sources(id),
+    provider TEXT NOT NULL,
     type TEXT NOT NULL CHECK (type IN ('video', 'pdf', 'simulation', 'course', 'article')),
     title TEXT NOT NULL,
     url TEXT UNIQUE NOT NULL,
     video_id TEXT,
     duration_sec INTEGER,
-    published_at TEXT,
-    engagement_score REAL NOT NULL DEFAULT 0,
-    status TEXT NOT NULL CHECK (status IN ('candidate', 'verified', 'rejected', 'hidden')),
+    score REAL NOT NULL DEFAULT 0,
+    rating INTEGER CHECK (rating IN (-1, 1)),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS resource_topics (
@@ -74,34 +50,6 @@ CREATE TABLE IF NOT EXISTS resource_topics (
     topic_id INTEGER NOT NULL REFERENCES topics(id),
     purpose TEXT NOT NULL CHECK (purpose IN ('concept', 'examples', 'application', 'reference')),
     PRIMARY KEY (resource_id, topic_id)
-);
-CREATE TABLE IF NOT EXISTS reviews (
-    id INTEGER PRIMARY KEY,
-    resource_id INTEGER NOT NULL REFERENCES resources(id),
-    reviewer_id INTEGER NOT NULL REFERENCES users(id),
-    alignment INTEGER NOT NULL,
-    accuracy INTEGER NOT NULL,
-    clarity INTEGER NOT NULL,
-    examples INTEGER NOT NULL,
-    age_fit INTEGER NOT NULL,
-    approved INTEGER NOT NULL,
-    recommendation TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS reports (
-    id INTEGER PRIMARY KEY,
-    resource_id INTEGER NOT NULL REFERENCES resources(id),
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    note TEXT NOT NULL DEFAULT '',
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-CREATE TABLE IF NOT EXISTS searches (
-    id INTEGER PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    query TEXT NOT NULL,
-    outcome TEXT NOT NULL CHECK (outcome IN ('match', 'choose', 'out_of_syllabus', 'blocked')),
-    topic_id INTEGER REFERENCES topics(id),
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS platforms (
     id INTEGER PRIMARY KEY,
@@ -111,12 +59,41 @@ CREATE TABLE IF NOT EXISTS platforms (
     note TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS library_entries (
-    user_id INTEGER NOT NULL REFERENCES users(id),
-    topic_id INTEGER NOT NULL REFERENCES topics(id),
+    topic_id INTEGER PRIMARY KEY REFERENCES topics(id),
     first_opened_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_opened_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    open_count INTEGER NOT NULL DEFAULT 1,
-    PRIMARY KEY (user_id, topic_id)
+    open_count INTEGER NOT NULL DEFAULT 1
+);
+CREATE TABLE IF NOT EXISTS questions (
+    id INTEGER PRIMARY KEY,
+    topic_id INTEGER NOT NULL REFERENCES topics(id),
+    question TEXT NOT NULL,
+    options_json TEXT NOT NULL,
+    answer_index INTEGER NOT NULL CHECK (answer_index BETWEEN 0 AND 3),
+    explanation TEXT NOT NULL,
+    flagged INTEGER NOT NULL DEFAULT 0,
+    flag_reason TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS quizzes (
+    id INTEGER PRIMARY KEY,
+    kind TEXT NOT NULL CHECK (kind IN ('topic', 'chapter', 'mistakes')),
+    topic_id INTEGER REFERENCES topics(id),
+    chapter_id INTEGER REFERENCES chapters(id),
+    time_limit_sec INTEGER,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    submitted_at TEXT,
+    score INTEGER,
+    total INTEGER NOT NULL,
+    confidence INTEGER CHECK (confidence BETWEEN 1 AND 5)
+);
+CREATE TABLE IF NOT EXISTS quiz_questions (
+    quiz_id INTEGER NOT NULL REFERENCES quizzes(id),
+    question_id INTEGER NOT NULL REFERENCES questions(id),
+    position INTEGER NOT NULL,
+    chosen_index INTEGER,
+    correct INTEGER,
+    PRIMARY KEY (quiz_id, question_id)
 );
 """
 
@@ -136,29 +113,13 @@ def init_db() -> None:
     Path(db_path()).parent.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
         conn.executescript(SCHEMA)
-        if not conn.execute("SELECT 1 FROM users").fetchone():
-            seed_users(conn)
         if not conn.execute("SELECT 1 FROM subjects").fetchone():
             seed_syllabus(conn)
             seed_resources(conn)
-        if not conn.execute("SELECT 1 FROM platforms").fetchone():
             conn.executemany(
                 "INSERT INTO platforms (domain, name, login_url, note) VALUES (:domain, :name, :login_url, :note)",
                 json.loads((SEED_DIR / "platforms.json").read_text()),
             )
-
-
-def seed_users(conn: sqlite3.Connection) -> None:
-    for username, name, role in [
-        ("student", "Student", "student"),
-        ("parent", "Parent", "parent"),
-        ("educator", "Educator", "educator"),
-    ]:
-        password = os.getenv(f"{role.upper()}_PASSWORD", username)
-        conn.execute(
-            "INSERT INTO users (username, name, role, password_hash) VALUES (?, ?, ?, ?)",
-            (username, name, role, hash_password(password)),
-        )
 
 
 def seed_syllabus(conn: sqlite3.Connection) -> None:
@@ -185,29 +146,17 @@ def seed_syllabus(conn: sqlite3.Connection) -> None:
 
 
 def seed_resources(conn: sqlite3.Connection) -> None:
-    data = json.loads((SEED_DIR / "resources.json").read_text())
-    source_ids = {}
-    for s in data["sources"]:
-        source_ids[s["kind"]] = conn.execute(
-            "INSERT INTO sources (kind, name, tier) VALUES (?, ?, ?)", (s["kind"], s["name"], s["tier"])
-        ).lastrowid
-
     # Every NCERT chapter PDF is a reference for all topics in that chapter.
     for ch in conn.execute("SELECT id, title, ncert_code, book FROM chapters").fetchall():
         resource_id = add_resource(
-            conn,
-            source_ids["ncert"],
-            "pdf",
-            f"NCERT {ch['book']} - {ch['title']} (textbook chapter with exercises)",
+            conn, "NCERT", "pdf", f"NCERT {ch['book']} - {ch['title']} (textbook chapter with exercises)",
             f"https://ncert.nic.in/textbook/pdf/{ch['ncert_code']}.pdf",
-            "verified",
         )
-        link_topics(conn, resource_id, [t["id"] for t in conn.execute(
-            "SELECT id FROM topics WHERE chapter_id = ?", (ch["id"],)
-        )], "reference")
+        topic_ids = [t["id"] for t in conn.execute("SELECT id FROM topics WHERE chapter_id = ?", (ch["id"],))]
+        link_topics(conn, resource_id, topic_ids, "reference")
 
-    for r in data["resources"]:
-        resource_id = add_resource(conn, source_ids[r["source"]], r["type"], r["title"], r["url"], "verified")
+    for r in json.loads((SEED_DIR / "resources.json").read_text()):
+        resource_id = add_resource(conn, r["provider"], r["type"], r["title"], r["url"])
         if "subject" in r:
             topic_ids = [t["id"] for t in conn.execute(
                 "SELECT t.id FROM topics t JOIN chapters c ON c.id = t.chapter_id"
@@ -226,12 +175,11 @@ def seed_resources(conn: sqlite3.Connection) -> None:
         link_topics(conn, resource_id, topic_ids, "concept")
 
 
-def add_resource(conn, source_id, type_, title, url, status, video_id=None, duration_sec=None,
-                 published_at=None, engagement_score=0.0) -> int:
+def add_resource(conn, provider, type_, title, url, video_id=None, duration_sec=None, score=0.0) -> int:
     return conn.execute(
-        "INSERT INTO resources (source_id, type, title, url, video_id, duration_sec, published_at,"
-        " engagement_score, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (source_id, type_, title, url, video_id, duration_sec, published_at, engagement_score, status),
+        "INSERT INTO resources (provider, type, title, url, video_id, duration_sec, score)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (provider, type_, title, url, video_id, duration_sec, score),
     ).lastrowid
 
 
@@ -243,6 +191,6 @@ def link_topics(conn, resource_id: int, topic_ids: list[int], purpose: str) -> N
 
 
 def platform_for(platforms: list[sqlite3.Row], url: str) -> sqlite3.Row | None:
-    """The allow-listed site a URL belongs to (exact domain or a subdomain of it), if any."""
+    """The known site a URL belongs to (exact domain or a subdomain of it), if any."""
     host = (urlparse(url).hostname or "").lower()
     return next((p for p in platforms if host == p["domain"] or host.endswith("." + p["domain"])), None)
