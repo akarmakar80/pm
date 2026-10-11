@@ -1,0 +1,27 @@
+{
+  "sources": [
+    {"kind": "ncert", "name": "NCERT", "tier": 1},
+    {"kind": "khan", "name": "Khan Academy", "tier": 2},
+    {"kind": "phet", "name": "PhET", "tier": 2}
+  ],
+  "resources": [
+    {"source": "khan", "type": "course", "title": "Khan Academy - Class 10 Maths (NCERT aligned course)", "url": "https://www.khanacademy.org/math/class-10", "subject": "maths"},
+
+    {"source": "phet", "type": "simulation", "title": "Balancing Chemical Equations", "url": "https://phet.colorado.edu/en/simulations/balancing-chemical-equations", "topics": [["jesc101", "Chemical Equations"]]},
+    {"source": "phet", "type": "simulation", "title": "Reactants, Products and Leftovers", "url": "https://phet.colorado.edu/en/simulations/reactants-products-and-leftovers", "topics": [["jesc101", "Chemical Equations"]]},
+    {"source": "phet", "type": "simulation", "title": "pH Scale", "url": "https://phet.colorado.edu/en/simulations/ph-scale", "topics": [["jesc102", "pH Scale"]]},
+    {"source": "phet", "type": "simulation", "title": "Acid-Base Solutions", "url": "https://phet.colorado.edu/en/simulations/acid-base-solutions", "topics": [["jesc102", "Properties of Acids and Bases"], ["jesc102", "pH Scale"]]},
+    {"source": "phet", "type": "simulation", "title": "Build a Molecule", "url": "https://phet.colorado.edu/en/simulations/build-a-molecule", "topics": [["jesc104", "Covalent Bonding in Carbon"]]},
+    {"source": "phet", "type": "simulation", "title": "Bending Light", "url": "https://phet.colorado.edu/en/simulations/bending-light", "topics": [["jesc109", "Refraction of Light"], ["jesc110", "Refraction through a Prism and Dispersion"]]},
+    {"source": "phet", "type": "simulation", "title": "Geometric Optics", "url": "https://phet.colorado.edu/en/simulations/geometric-optics", "topics": [["jesc109", "Spherical Lenses"], ["jesc109", "Reflection and Spherical Mirrors"]]},
+    {"source": "phet", "type": "simulation", "title": "Circuit Construction Kit: DC", "url": "https://phet.colorado.edu/en/simulations/circuit-construction-kit-dc", "topics": [["jesc111", "Electric Current and Potential Difference"], ["jesc111", "Resistors in Series and Parallel"]]},
+    {"source": "phet", "type": "simulation", "title": "Ohm's Law", "url": "https://phet.colorado.edu/en/simulations/ohms-law", "topics": [["jesc111", "Ohm's Law and Resistance"]]},
+    {"source": "phet", "type": "simulation", "title": "Resistance in a Wire", "url": "https://phet.colorado.edu/en/simulations/resistance-in-a-wire", "topics": [["jesc111", "Ohm's Law and Resistance"]]},
+    {"source": "phet", "type": "simulation", "title": "Magnets and Electromagnets", "url": "https://phet.colorado.edu/en/simulations/magnets-and-electromagnets", "topics": [["jesc112", "Magnetic Field and Field Lines"], ["jesc112", "Magnetic Field due to a Current"]]},
+    {"source": "phet", "type": "simulation", "title": "Magnet and Compass", "url": "https://phet.colorado.edu/en/simulations/magnet-and-compass", "topics": [["jesc112", "Magnetic Field and Field Lines"]]},
+    {"source": "phet", "type": "simulation", "title": "Graphing Quadratics", "url": "https://phet.colorado.edu/en/simulations/graphing-quadratics", "topics": [["jemh102", "Geometrical Meaning of the Zeroes of a Polynomial"], ["jemh104", "Nature of Roots"]]},
+    {"source": "phet", "type": "simulation", "title": "Graphing Lines", "url": "https://phet.colorado.edu/en/simulations/graphing-lines", "topics": [["jemh103", "Graphical Method of Solution"]]},
+    {"source": "phet", "type": "simulation", "title": "Trig Tour", "url": "https://phet.colorado.edu/en/simulations/trig-tour", "topics": [["jemh108", "Trigonometric Ratios"], ["jemh108", "Trigonometric Ratios of Specific Angles"]]},
+    {"source": "phet", "type": "simulation", "title": "Plinko Probability", "url": "https://phet.colorado.edu/en/simulations/plinko-probability", "topics": [["jemh114", "Theoretical Probability"]]}
+  ]
+}

@@ -1,0 +1,245 @@
+{
+  "syllabus_year": "2025-26",
+  "subjects": [
+    {
+      "code": "maths",
+      "name": "Mathematics",
+      "chapters": [
+        {"book": "Mathematics", "number": 1, "title": "Real Numbers", "ncert": "jemh101", "topics": [
+          {"title": "Fundamental Theorem of Arithmetic", "keywords": "prime factorisation factorization HCF LCM factor tree composite numbers"},
+          {"title": "Irrational Numbers", "keywords": "proof root 2 irrational square root rational numbers contradiction"}
+        ]},
+        {"book": "Mathematics", "number": 2, "title": "Polynomials", "ncert": "jemh102", "topics": [
+          {"title": "Geometrical Meaning of the Zeroes of a Polynomial", "keywords": "graph of polynomial zeroes roots parabola linear quadratic cubic"},
+          {"title": "Relationship between Zeroes and Coefficients", "keywords": "sum of zeroes product of zeroes quadratic polynomial alpha beta"}
+        ]},
+        {"book": "Mathematics", "number": 3, "title": "Pair of Linear Equations in Two Variables", "ncert": "jemh103", "topics": [
+          {"title": "Graphical Method of Solution", "keywords": "graph consistent inconsistent intersecting parallel coincident lines linear equations"},
+          {"title": "Substitution Method", "keywords": "solve linear equations substitution algebraic method"},
+          {"title": "Elimination Method", "keywords": "solve linear equations elimination algebraic method"},
+          {"title": "Word Problems on Linear Equations", "keywords": "applications age problems money speed boat stream fraction digits linear equations"}
+        ]},
+        {"book": "Mathematics", "number": 4, "title": "Quadratic Equations", "ncert": "jemh104", "topics": [
+          {"title": "Standard Form of a Quadratic Equation", "keywords": "ax2 bx c quadratic equation form"},
+          {"title": "Solving Quadratic Equations by Factorisation", "keywords": "factorization splitting middle term roots quadratic"},
+          {"title": "Quadratic Formula", "keywords": "sridharacharya formula roots quadratic equation"},
+          {"title": "Nature of Roots", "keywords": "discriminant real equal distinct roots b2 4ac quadratic"}
+        ]},
+        {"book": "Mathematics", "number": 5, "title": "Arithmetic Progressions", "ncert": "jemh105", "topics": [
+          {"title": "Introduction to Arithmetic Progressions", "keywords": "AP sequence common difference first term"},
+          {"title": "nth Term of an AP", "keywords": "general term an a n-1 d arithmetic progression"},
+          {"title": "Sum of First n Terms of an AP", "keywords": "sum Sn n/2 arithmetic series arithmetic progression"}
+        ]},
+        {"book": "Mathematics", "number": 6, "title": "Triangles", "ncert": "jemh106", "topics": [
+          {"title": "Similar Figures", "keywords": "similarity similar polygons congruent shapes"},
+          {"title": "Basic Proportionality Theorem", "keywords": "BPT Thales theorem converse parallel line divides sides proportion triangle"},
+          {"title": "Criteria for Similarity of Triangles", "keywords": "AAA SSS SAS AA similarity criterion similar triangles"}
+        ]},
+        {"book": "Mathematics", "number": 7, "title": "Coordinate Geometry", "ncert": "jemh107", "topics": [
+          {"title": "Distance Formula", "keywords": "distance between two points coordinates"},
+          {"title": "Section Formula", "keywords": "internal division ratio midpoint formula coordinates trisection"}
+        ]},
+        {"book": "Mathematics", "number": 8, "title": "Introduction to Trigonometry", "ncert": "jemh108", "topics": [
+          {"title": "Trigonometric Ratios", "keywords": "sin cos tan cosec sec cot sine cosine tangent right triangle"},
+          {"title": "Trigonometric Ratios of Specific Angles", "keywords": "0 30 45 60 90 degrees table values trigonometry"},
+          {"title": "Trigonometric Identities", "keywords": "sin2 cos2 1 identity proof trigonometry"}
+        ]},
+        {"book": "Mathematics", "number": 9, "title": "Some Applications of Trigonometry", "ncert": "jemh109", "topics": [
+          {"title": "Heights and Distances", "keywords": "angle of elevation angle of depression line of sight tower height trigonometry applications"}
+        ]},
+        {"book": "Mathematics", "number": 10, "title": "Circles", "ncert": "jemh110", "topics": [
+          {"title": "Tangent to a Circle", "keywords": "tangent perpendicular radius secant point of contact"},
+          {"title": "Number of Tangents from a Point on a Circle", "keywords": "lengths of tangents from external point equal circle"}
+        ]},
+        {"book": "Mathematics", "number": 11, "title": "Areas Related to Circles", "ncert": "jemh111", "topics": [
+          {"title": "Areas of Sector and Segment of a Circle", "keywords": "sector segment arc length minor major area circle"}
+        ]},
+        {"book": "Mathematics", "number": 12, "title": "Surface Areas and Volumes", "ncert": "jemh112", "topics": [
+          {"title": "Surface Area of a Combination of Solids", "keywords": "cone cylinder hemisphere sphere cuboid curved total surface area"},
+          {"title": "Volume of a Combination of Solids", "keywords": "cone cylinder hemisphere sphere cuboid volume capacity"}
+        ]},
+        {"book": "Mathematics", "number": 13, "title": "Statistics", "ncert": "jemh113", "topics": [
+          {"title": "Mean of Grouped Data", "keywords": "direct method assumed mean step deviation class mark average"},
+          {"title": "Mode of Grouped Data", "keywords": "modal class mode formula"},
+          {"title": "Median of Grouped Data", "keywords": "cumulative frequency median class median formula"}
+        ]},
+        {"book": "Mathematics", "number": 14, "title": "Probability", "ncert": "jemh114", "topics": [
+          {"title": "Theoretical Probability", "keywords": "events outcomes dice coin playing cards complementary events sample space probability"}
+        ]}
+      ]
+    },
+    {
+      "code": "science",
+      "name": "Science",
+      "chapters": [
+        {"book": "Science", "number": 1, "title": "Chemical Reactions and Equations", "ncert": "jesc101", "topics": [
+          {"title": "Chemical Equations", "keywords": "writing balancing chemical equations reactants products"},
+          {"title": "Types of Chemical Reactions", "keywords": "combination decomposition displacement double displacement redox oxidation reduction exothermic endothermic precipitation"},
+          {"title": "Effects of Oxidation in Everyday Life", "keywords": "corrosion rusting rancidity"}
+        ]},
+        {"book": "Science", "number": 2, "title": "Acids, Bases and Salts", "ncert": "jesc102", "topics": [
+          {"title": "Properties of Acids and Bases", "keywords": "indicators litmus reaction with metals carbonates neutralisation neutralization alkali"},
+          {"title": "pH Scale", "keywords": "strength of acids bases pH in everyday life tooth decay soil digestion"},
+          {"title": "Salts and their Uses", "keywords": "sodium chloride bleaching powder baking soda washing soda plaster of paris water of crystallisation chlor-alkali process"}
+        ]},
+        {"book": "Science", "number": 3, "title": "Metals and Non-metals", "ncert": "jesc103", "topics": [
+          {"title": "Physical Properties of Metals and Non-metals", "keywords": "malleability ductility conductivity lustre sonorous"},
+          {"title": "Chemical Properties of Metals", "keywords": "reactivity series reaction with oxygen water acids amphoteric oxides"},
+          {"title": "Ionic Compounds", "keywords": "electron transfer ionic bond electrovalent properties of ionic compounds"},
+          {"title": "Occurrence and Extraction of Metals", "keywords": "metallurgy ores minerals roasting calcination refining electrolytic refining enrichment"},
+          {"title": "Corrosion and its Prevention", "keywords": "galvanisation galvanization alloys rusting prevention"}
+        ]},
+        {"book": "Science", "number": 4, "title": "Carbon and its Compounds", "ncert": "jesc104", "topics": [
+          {"title": "Covalent Bonding in Carbon", "keywords": "covalent bond electron dot structure tetravalency catenation allotropes"},
+          {"title": "Hydrocarbons and Functional Groups", "keywords": "saturated unsaturated alkane alkene alkyne homologous series nomenclature isomers"},
+          {"title": "Chemical Properties of Carbon Compounds", "keywords": "combustion oxidation addition substitution hydrogenation"},
+          {"title": "Ethanol and Ethanoic Acid", "keywords": "alcohol acetic acid esterification esters"},
+          {"title": "Soaps and Detergents", "keywords": "micelles cleansing action hard water"}
+        ]},
+        {"book": "Science", "number": 5, "title": "Life Processes", "ncert": "jesc105", "topics": [
+          {"title": "Nutrition", "keywords": "autotrophic heterotrophic photosynthesis how plants make food human digestive system digestion"},
+          {"title": "Respiration", "keywords": "aerobic anaerobic ATP human respiratory system lungs breathing"},
+          {"title": "Transportation", "keywords": "heart blood vessels circulation lymph xylem phloem transpiration double circulation"},
+          {"title": "Excretion", "keywords": "kidney nephron dialysis excretion in plants urine"}
+        ]},
+        {"book": "Science", "number": 6, "title": "Control and Coordination", "ncert": "jesc106", "topics": [
+          {"title": "Nervous System", "keywords": "neuron reflex action reflex arc brain synapse spinal cord"},
+          {"title": "Coordination in Plants", "keywords": "tropism phototropism geotropism plant hormones auxin gibberellin"},
+          {"title": "Hormones in Animals", "keywords": "endocrine glands thyroid insulin adrenaline pituitary iodised salt"}
+        ]},
+        {"book": "Science", "number": 7, "title": "How do Organisms Reproduce?", "ncert": "jesc107", "topics": [
+          {"title": "Asexual Reproduction", "keywords": "fission fragmentation regeneration budding vegetative propagation spore formation DNA copying variation"},
+          {"title": "Sexual Reproduction in Flowering Plants", "keywords": "pollination fertilisation flower parts stamen pistil seed"},
+          {"title": "Reproduction in Human Beings", "keywords": "puberty male reproductive system female reproductive system menstruation"},
+          {"title": "Reproductive Health", "keywords": "contraception sexually transmitted diseases"}
+        ]},
+        {"book": "Science", "number": 8, "title": "Heredity", "ncert": "jesc108", "topics": [
+          {"title": "Mendel's Experiments and Inheritance", "keywords": "Mendel dominant recessive traits monohybrid dihybrid cross genotype phenotype genes"},
+          {"title": "Sex Determination", "keywords": "sex chromosomes X Y"}
+        ]},
+        {"book": "Science", "number": 9, "title": "Light - Reflection and Refraction", "ncert": "jesc109", "topics": [
+          {"title": "Reflection and Spherical Mirrors", "keywords": "concave convex mirror ray diagrams image formation mirror formula magnification"},
+          {"title": "Refraction of Light", "keywords": "refractive index Snell's law glass slab bending of light"},
+          {"title": "Spherical Lenses", "keywords": "convex lens concave lens lens formula power of a lens ray diagrams"}
+        ]},
+        {"book": "Science", "number": 10, "title": "The Human Eye and the Colourful World", "ncert": "jesc110", "topics": [
+          {"title": "The Human Eye and Defects of Vision", "keywords": "accommodation myopia hypermetropia presbyopia near point far point"},
+          {"title": "Refraction through a Prism and Dispersion", "keywords": "prism spectrum rainbow VIBGYOR dispersion of white light"},
+          {"title": "Atmospheric Refraction and Scattering of Light", "keywords": "twinkling of stars advance sunrise Tyndall effect blue sky red sunset"}
+        ]},
+        {"book": "Science", "number": 11, "title": "Electricity", "ncert": "jesc111", "topics": [
+          {"title": "Electric Current and Potential Difference", "keywords": "charge ampere volt circuit diagram symbols ammeter voltmeter"},
+          {"title": "Ohm's Law and Resistance", "keywords": "V=IR resistivity factors affecting resistance"},
+          {"title": "Resistors in Series and Parallel", "keywords": "combination of resistors equivalent resistance"},
+          {"title": "Heating Effect of Current and Electric Power", "keywords": "Joule's law of heating watt kilowatt hour fuse electric energy"}
+        ]},
+        {"book": "Science", "number": 12, "title": "Magnetic Effects of Electric Current", "ncert": "jesc112", "topics": [
+          {"title": "Magnetic Field and Field Lines", "keywords": "compass bar magnet magnetic field lines"},
+          {"title": "Magnetic Field due to a Current", "keywords": "straight conductor circular loop solenoid right hand thumb rule electromagnet"},
+          {"title": "Force on a Current-Carrying Conductor", "keywords": "Fleming's left hand rule magnetic force"},
+          {"title": "Domestic Electric Circuits", "keywords": "earthing live wire neutral wire short circuit overloading fuse"}
+        ]},
+        {"book": "Science", "number": 13, "title": "Our Environment", "ncert": "jesc113", "topics": [
+          {"title": "Ecosystem and Food Chains", "keywords": "producers consumers decomposers trophic levels food web 10 percent law biological magnification"},
+          {"title": "Environmental Problems", "keywords": "ozone depletion CFC garbage disposal biodegradable non-biodegradable waste"}
+        ]}
+      ]
+    },
+    {
+      "code": "social-science",
+      "name": "Social Science",
+      "chapters": [
+        {"book": "History", "number": 1, "title": "The Rise of Nationalism in Europe", "ncert": "jess301", "topics": [
+          {"title": "The French Revolution and the Idea of the Nation", "keywords": "French revolution nation state la patrie le citoyen"},
+          {"title": "The Making of Nationalism in Europe", "keywords": "liberalism Napoleonic code 1848 revolution conservatism romanticism"},
+          {"title": "Unification of Germany and Italy", "keywords": "Bismarck Mazzini Garibaldi Cavour Prussia"},
+          {"title": "Visualising the Nation", "keywords": "Marianne Germania allegory Balkans nationalism imperialism"}
+        ]},
+        {"book": "History", "number": 2, "title": "Nationalism in India", "ncert": "jess302", "topics": [
+          {"title": "The First World War, Khilafat and Non-Cooperation", "keywords": "Rowlatt Act Jallianwala Bagh Gandhi satyagraha non cooperation movement Khilafat"},
+          {"title": "Civil Disobedience Movement", "keywords": "Salt March Dandi Simon Commission Poona Pact Purna Swaraj"},
+          {"title": "The Sense of Collective Belonging", "keywords": "Bharat Mata folklore national flag symbols"}
+        ]},
+        {"book": "History", "number": 3, "title": "The Making of a Global World", "ncert": "jess303", "topics": [
+          {"title": "The Pre-modern World", "keywords": "silk routes food travels conquest disease trade"},
+          {"title": "The Nineteenth Century (1815-1914)", "keywords": "corn laws rinderpest indentured labour world economy colonialism"},
+          {"title": "The Inter-war Economy and the Great Depression", "keywords": "great depression wartime transformation mass production Henry Ford"},
+          {"title": "Rebuilding a World Economy: The Post-war Era", "keywords": "Bretton Woods IMF World Bank NIEO decolonisation"}
+        ]},
+        {"book": "History", "number": 4, "title": "The Age of Industrialisation", "ncert": "jess304", "topics": [
+          {"title": "Before the Industrial Revolution", "keywords": "proto-industrialisation merchants guilds"},
+          {"title": "Factories and the Pace of Industrial Change", "keywords": "hand labour steam power factory cotton mills"},
+          {"title": "Industrialisation in the Colonies", "keywords": "Indian textiles weavers gomastha market for goods advertisements"}
+        ]},
+        {"book": "History", "number": 5, "title": "Print Culture and the Modern World", "ncert": "jess305", "topics": [
+          {"title": "The First Printed Books and Print in Europe", "keywords": "Gutenberg printing press woodblock China Japan"},
+          {"title": "The Print Revolution and its Impact", "keywords": "reading mania religious debates enlightenment"},
+          {"title": "Print in India", "keywords": "vernacular press act religious reform women and print censorship"}
+        ]},
+        {"book": "Geography", "number": 1, "title": "Resources and Development", "ncert": "jess101", "topics": [
+          {"title": "Types of Resources and Resource Planning", "keywords": "renewable non-renewable sustainable development Agenda 21 resource planning"},
+          {"title": "Land Resources and Soils", "keywords": "land use land degradation soil types alluvial black laterite soil erosion conservation"}
+        ]},
+        {"book": "Geography", "number": 2, "title": "Forest and Wildlife Resources", "ncert": "jess102", "topics": [
+          {"title": "Conservation of Forests and Wildlife", "keywords": "biodiversity Wildlife Protection Act Project Tiger community conservation Chipko sacred groves endangered species"}
+        ]},
+        {"book": "Geography", "number": 3, "title": "Water Resources", "ncert": "jess103", "topics": [
+          {"title": "Water Scarcity and Multipurpose River Projects", "keywords": "dams Narmada Bachao Andolan water scarcity"},
+          {"title": "Rainwater Harvesting", "keywords": "rooftop rainwater harvesting kuls tankas"}
+        ]},
+        {"book": "Geography", "number": 4, "title": "Agriculture", "ncert": "jess104", "topics": [
+          {"title": "Types of Farming and Cropping Patterns", "keywords": "primitive subsistence intensive commercial farming rabi kharif zaid"},
+          {"title": "Major Crops", "keywords": "rice wheat millets pulses sugarcane tea coffee cotton jute"},
+          {"title": "Technological and Institutional Reforms", "keywords": "green revolution white revolution land reforms"}
+        ]},
+        {"book": "Geography", "number": 5, "title": "Minerals and Energy Resources", "ncert": "jess105", "topics": [
+          {"title": "Minerals", "keywords": "ferrous non-ferrous iron ore bauxite mica mode of occurrence"},
+          {"title": "Energy Resources", "keywords": "coal petroleum natural gas solar wind nuclear conventional non-conventional energy conservation"}
+        ]},
+        {"book": "Geography", "number": 6, "title": "Manufacturing Industries", "ncert": "jess106", "topics": [
+          {"title": "Classification of Industries", "keywords": "agro based mineral based cotton textile iron and steel industrial location"},
+          {"title": "Industrial Pollution and Environmental Degradation", "keywords": "air water noise pollution industries"}
+        ]},
+        {"book": "Geography", "number": 7, "title": "Lifelines of National Economy", "ncert": "jess107", "topics": [
+          {"title": "Transport", "keywords": "roadways railways pipelines waterways airways golden quadrilateral"},
+          {"title": "Communication and International Trade", "keywords": "communication trade tourism"}
+        ]},
+        {"book": "Political Science", "number": 1, "title": "Power-sharing", "ncert": "jess401", "topics": [
+          {"title": "Power Sharing in Belgium and Sri Lanka", "keywords": "majoritarianism accommodation ethnic"},
+          {"title": "Forms of Power Sharing", "keywords": "horizontal vertical checks and balances coalition government"}
+        ]},
+        {"book": "Political Science", "number": 2, "title": "Federalism", "ncert": "jess402", "topics": [
+          {"title": "What is Federalism", "keywords": "coming together holding together union list state list concurrent list"},
+          {"title": "Decentralisation in India", "keywords": "panchayati raj local government 73rd amendment linguistic states"}
+        ]},
+        {"book": "Political Science", "number": 3, "title": "Gender, Religion and Caste", "ncert": "jess403", "topics": [
+          {"title": "Gender and Politics", "keywords": "sexual division of labour feminist movement women representation"},
+          {"title": "Religion, Communalism and Politics", "keywords": "communalism secular state"},
+          {"title": "Caste and Politics", "keywords": "caste inequality elections"}
+        ]},
+        {"book": "Political Science", "number": 4, "title": "Political Parties", "ncert": "jess404", "topics": [
+          {"title": "Functions of Political Parties and Party Systems", "keywords": "one party two party multiparty system"},
+          {"title": "National and State Parties", "keywords": "Election Commission recognition challenges reforms anti-defection law"}
+        ]},
+        {"book": "Political Science", "number": 5, "title": "Outcomes of Democracy", "ncert": "jess405", "topics": [
+          {"title": "Outcomes of Democracy", "keywords": "accountable responsive legitimate government economic growth inequality dignity of citizens"}
+        ]},
+        {"book": "Economics", "number": 1, "title": "Development", "ncert": "jess201", "topics": [
+          {"title": "Development and Income", "keywords": "per capita income HDI human development index infant mortality literacy sustainability"}
+        ]},
+        {"book": "Economics", "number": 2, "title": "Sectors of the Indian Economy", "ncert": "jess202", "topics": [
+          {"title": "Primary, Secondary and Tertiary Sectors", "keywords": "GDP final goods intermediate goods sectors"},
+          {"title": "Organised and Unorganised Sectors", "keywords": "MGNREGA underemployment disguised unemployment public private sector"}
+        ]},
+        {"book": "Economics", "number": 3, "title": "Money and Credit", "ncert": "jess203", "topics": [
+          {"title": "Money and its Modern Forms", "keywords": "barter double coincidence of wants demand deposits cheque"},
+          {"title": "Credit and its Sources", "keywords": "formal informal credit collateral terms of credit self help groups Grameen Bank"}
+        ]},
+        {"book": "Economics", "number": 4, "title": "Globalisation and the Indian Economy", "ncert": "jess204", "topics": [
+          {"title": "MNCs and Foreign Trade", "keywords": "multinational corporations foreign investment"},
+          {"title": "Globalisation and its Impact", "keywords": "liberalisation WTO SEZ fair globalisation"}
+        ]}
+      ]
+    }
+  ]
+}

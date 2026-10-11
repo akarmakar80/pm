@@ -1,0 +1,17 @@
+services:
+  backend:
+    build: ./backend
+    container_name: study_backend
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build: ./frontend
+    container_name: study_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
