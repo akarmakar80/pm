@@ -95,6 +95,20 @@ Rules:
 - **Re-verification.** Links are health-checked weekly. Items whose source changes (video removed, PDF moved) are hidden automatically, and the next-best verified alternate is promoted. Items are flagged for re-review when the syllabus year changes.
 - **Student feedback.** "Helpful / Not helpful / Something is wrong" on every item. A "something is wrong" report hides the item for the student and sends it back to review.
 
+### Allowed sites and third-party sign-in
+
+- Links can only be added from an allow-list of sites (NCERT, CBSE, DIKSHA, SWAYAM, Khan Academy, PhET, GeoGebra, Desmos, OLabs, TED-Ed, YouTube, Udemy, Coursera, edX, BYJU'S, Vedantu, Unacademy, Physics Wallah). A parent can add more.
+- Links are always shown once verified, even when a site needs an account. Cards from such sites show the site's note (e.g. "many courses are paid") and a "Sign in to <site>" link. A "Learning sites" page lists every site with its sign-in page.
+- The student signs in on the site itself in a new tab; the browser keeps that session. Study Hub never asks for, proxies or stores third-party passwords.
+
+### Content safety
+
+- Allow-listed sources plus educator review (with an age-appropriateness score) are the main safeguard.
+- YouTube videos that are age-restricted, not embeddable, or whose title/description contains a blocked term are never indexed or accepted, from any channel.
+- Searches with blocked terms return nothing and are flagged to the parent. The blocked-terms list deliberately excludes syllabus vocabulary (reproduction, sex determination, "naked eye"), and a test checks that no syllabus topic is blocked.
+- Content-Security-Policy restricts embeds to the YouTube privacy-mode player; everything else opens in a new tab.
+- External sites are outside the platform's control, so device-level parental controls and a family DNS filter are recommended alongside it.
+
 Each card in the UI shows a badge: `NCERT`, `CBSE Official`, `DIKSHA`, `Khan Academy`, `PhET`, or `Verified by <educator name>`.
 
 ## 5. Topic Search and Topic Packs

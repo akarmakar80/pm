@@ -2,6 +2,7 @@ import json
 import os
 import sqlite3
 from pathlib import Path
+from urllib.parse import urlparse
 
 from auth import hash_password
 
@@ -98,9 +99,16 @@ CREATE TABLE IF NOT EXISTS searches (
     id INTEGER PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id),
     query TEXT NOT NULL,
-    outcome TEXT NOT NULL CHECK (outcome IN ('match', 'choose', 'out_of_syllabus')),
+    outcome TEXT NOT NULL CHECK (outcome IN ('match', 'choose', 'out_of_syllabus', 'blocked')),
     topic_id INTEGER REFERENCES topics(id),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS platforms (
+    id INTEGER PRIMARY KEY,
+    domain TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    login_url TEXT,
+    note TEXT NOT NULL DEFAULT ''
 );
 CREATE TABLE IF NOT EXISTS library_entries (
     user_id INTEGER NOT NULL REFERENCES users(id),
@@ -133,6 +141,11 @@ def init_db() -> None:
         if not conn.execute("SELECT 1 FROM subjects").fetchone():
             seed_syllabus(conn)
             seed_resources(conn)
+        if not conn.execute("SELECT 1 FROM platforms").fetchone():
+            conn.executemany(
+                "INSERT INTO platforms (domain, name, login_url, note) VALUES (:domain, :name, :login_url, :note)",
+                json.loads((SEED_DIR / "platforms.json").read_text()),
+            )
 
 
 def seed_users(conn: sqlite3.Connection) -> None:
@@ -227,3 +240,9 @@ def link_topics(conn, resource_id: int, topic_ids: list[int], purpose: str) -> N
         "INSERT OR IGNORE INTO resource_topics (resource_id, topic_id, purpose) VALUES (?, ?, ?)",
         [(resource_id, topic_id, purpose) for topic_id in topic_ids],
     )
+
+
+def platform_for(platforms: list[sqlite3.Row], url: str) -> sqlite3.Row | None:
+    """The allow-listed site a URL belongs to (exact domain or a subdomain of it), if any."""
+    host = (urlparse(url).hostname or "").lower()
+    return next((p for p in platforms if host == p["domain"] or host.endswith("." + p["domain"])), None)

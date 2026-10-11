@@ -26,6 +26,12 @@ function Results() {
           </div>
         </section>
       )}
+      {data?.outcome === "blocked" && (
+        <section className="rounded-lg border border-line bg-white p-6">
+          <h1 className="font-display text-xl font-semibold">This search is not available on Study Hub</h1>
+          <p className="mt-2 text-muted">Try a topic or chapter name from your textbook.</p>
+        </section>
+      )}
       {data?.outcome === "out_of_syllabus" && (
         <section className="rounded-lg border border-line bg-white p-6">
           <h1 className="font-display text-xl font-semibold">No Class 10 topic found for &ldquo;{q}&rdquo;</h1>

@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 import httpx
 
 from db import add_resource, link_topics
+from safety import is_blocked
 from search import match_topics
 
 API = "https://www.googleapis.com/youtube/v3"
@@ -86,18 +87,32 @@ def index_channel(conn: sqlite3.Connection, client: httpx.Client, api_key: str, 
     return added
 
 
-def store_videos(conn, client, api_key, source_id, video_ids, status) -> int:
-    videos = client.get(
+def fetch_videos(client: httpx.Client, api_key: str, video_ids: list[str]) -> list[dict]:
+    return client.get(
         f"{API}/videos",
         params={"part": "snippet,contentDetails,statistics,status", "id": ",".join(video_ids), "key": api_key},
     ).raise_for_status().json().get("items", [])
+
+
+def unsafe_reason(video: dict) -> str | None:
+    """Why a video must never be shown, or None. Applies to every video, from any channel."""
+    if video["contentDetails"].get("contentRating", {}).get("ytRating") == "ytAgeRestricted":
+        return "This video is age-restricted on YouTube"
+    if not video["status"].get("embeddable", False):
+        return "This video cannot be played inside Study Hub"
+    if is_blocked(f"{video['snippet']['title']} {video['snippet'].get('description', '')}"):
+        return "This video's title or description contains blocked words"
+    return None
+
+
+def store_videos(conn, client, api_key, source_id, video_ids, status) -> int:
     added = 0
-    for v in videos:
+    for v in fetch_videos(client, api_key, video_ids):
         title = v["snippet"]["title"]
         duration = parse_duration(v["contentDetails"]["duration"])
         url = f"https://www.youtube.com/watch?v={v['id']}"
         if (
-            not v["status"].get("embeddable", False)
+            unsafe_reason(v)
             or duration < MIN_DURATION_SEC
             or OTHER_CLASS.search(title)
             or conn.execute("SELECT 1 FROM resources WHERE url = ?", (url,)).fetchone()

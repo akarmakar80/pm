@@ -32,5 +32,19 @@ cd frontend && npm ci && npm run dev   # proxies /api to localhost:8000
   scores them on the rubric (every score 3 or higher to approve).
 - Educators can also add resources directly; their name and recommendation appear on the card.
 - A student "Report a problem" hides the item until it is reviewed again.
+- Links can only come from the allowed sites list (`backend/seed/platforms.json`, extended by a parent
+  under Review > Sites). Sites that need an account show a "Sign in" link; the student signs in on the
+  site itself and Study Hub never stores those passwords.
 - Syllabus data is in `backend/seed/syllabus.json` (2025-26). Check it against the CBSE curriculum
   each year.
+
+## Keeping content safe
+
+- Nothing from the open web is shown: every item comes from an allowed site and passes review.
+- YouTube videos that are age-restricted, cannot be embedded, or whose title/description contains a
+  blocked term (`backend/seed/blocked_terms.txt`) are never indexed or accepted.
+- Searches containing blocked terms return nothing and are flagged to the parent under Review > Searches.
+- Only YouTube's privacy-mode player can be embedded (Content-Security-Policy `frame-src`).
+- External sites open in a new tab and are outside Study Hub's control. Also turn on device-level
+  protection: Google Family Link or Microsoft Family Safety, YouTube Restricted Mode, and a family DNS
+  filter on the home router (for example Cloudflare 1.1.1.3 or OpenDNS FamilyShield).

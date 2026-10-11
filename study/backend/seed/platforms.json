@@ -1,0 +1,22 @@
+[
+  {"domain": "ncert.nic.in", "name": "NCERT", "login_url": null, "note": "Free textbooks, no account needed"},
+  {"domain": "cbseacademic.nic.in", "name": "CBSE Academic", "login_url": null, "note": "Official syllabus and sample papers"},
+  {"domain": "cbse.gov.in", "name": "CBSE", "login_url": null, "note": "Official CBSE website"},
+  {"domain": "diksha.gov.in", "name": "DIKSHA", "login_url": "https://diksha.gov.in/", "note": "Government e-content; sign-in optional, saves progress"},
+  {"domain": "swayam.gov.in", "name": "SWAYAM", "login_url": "https://swayam.gov.in/", "note": "Government online courses; sign-in needed to enrol"},
+  {"domain": "khanacademy.org", "name": "Khan Academy", "login_url": "https://www.khanacademy.org/login", "note": "Free; sign in to save progress and practice"},
+  {"domain": "phet.colorado.edu", "name": "PhET", "login_url": null, "note": "Free simulations, no account needed"},
+  {"domain": "geogebra.org", "name": "GeoGebra", "login_url": "https://accounts.geogebra.org/", "note": "Free; sign-in optional"},
+  {"domain": "desmos.com", "name": "Desmos", "login_url": "https://www.desmos.com/", "note": "Free graphing calculator; sign-in optional"},
+  {"domain": "olabs.edu.in", "name": "OLabs", "login_url": "https://www.olabs.edu.in/", "note": "Free virtual labs; registration optional"},
+  {"domain": "ed.ted.com", "name": "TED-Ed", "login_url": null, "note": "Free lessons"},
+  {"domain": "youtube.com", "name": "YouTube", "login_url": null, "note": "Played inside Study Hub in privacy mode"},
+  {"domain": "youtu.be", "name": "YouTube", "login_url": null, "note": "Played inside Study Hub in privacy mode"},
+  {"domain": "udemy.com", "name": "Udemy", "login_url": "https://www.udemy.com/join/login-popup/", "note": "Sign-in needed; many courses are paid"},
+  {"domain": "coursera.org", "name": "Coursera", "login_url": "https://www.coursera.org/?authMode=login", "note": "Sign-in needed to enrol"},
+  {"domain": "edx.org", "name": "edX", "login_url": "https://authn.edx.org/login", "note": "Sign-in needed to enrol"},
+  {"domain": "byjus.com", "name": "BYJU'S", "login_url": "https://byjus.com/", "note": "Some content needs sign-in"},
+  {"domain": "vedantu.com", "name": "Vedantu", "login_url": "https://www.vedantu.com/", "note": "Some content needs sign-in"},
+  {"domain": "unacademy.com", "name": "Unacademy", "login_url": "https://unacademy.com/", "note": "Some content needs sign-in; many courses are paid"},
+  {"domain": "pw.live", "name": "Physics Wallah", "login_url": "https://www.pw.live/", "note": "Some content needs sign-in; many courses are paid"}
+]

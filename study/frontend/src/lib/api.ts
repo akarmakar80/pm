@@ -21,6 +21,8 @@ export type TopicSummary = {
 export type Purpose = "concept" | "examples" | "application" | "reference";
 export type ResourceType = "video" | "pdf" | "simulation" | "course" | "article";
 
+export type Platform = { id?: number; name: string; domain: string; login_url: string | null; note: string };
+
 export type Resource = {
   id: number;
   type: ResourceType;
@@ -33,6 +35,7 @@ export type Resource = {
   badge: string;
   tier: number;
   recommendation: string | null;
+  platform: Platform | null;
 };
 
 export type TopicPack = TopicSummary & {
@@ -41,7 +44,7 @@ export type TopicPack = TopicSummary & {
 
 export type SearchResult = {
   query: string;
-  outcome: "match" | "choose" | "out_of_syllabus";
+  outcome: "match" | "choose" | "out_of_syllabus" | "blocked";
   topics: TopicSummary[];
 };
 

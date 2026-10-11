@@ -11,7 +11,10 @@ VIDEOS = [
     ("vid00000004", "Ohm's law in 30 seconds #shorts", "PT30S", True),
     ("vid00000005", "Funny vlog from our trip", "PT10M", True),
     ("vid00000006", "Refraction through glass slab", "PT12M", False),
+    ("vid00000007", "Ohm's law resistance experiment", "PT12M", True),
+    ("vid00000008", "Ohm's law trick sexy teacher", "PT12M", True),
 ]
+AGE_RESTRICTED = {"vid00000007"}
 
 
 def fake_api(request: httpx.Request) -> httpx.Response:
@@ -27,7 +30,8 @@ def fake_api(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, json={"items": [{
             "id": vid,
             "snippet": {"title": title, "publishedAt": "2024-06-01T10:00:00Z"},
-            "contentDetails": {"duration": duration},
+            "contentDetails": {"duration": duration} | (
+                {"contentRating": {"ytRating": "ytAgeRestricted"}} if vid in AGE_RESTRICTED else {}),
             "statistics": {"viewCount": "250000", "likeCount": "8000", "commentCount": "400"},
             "status": {"embeddable": embeddable},
         } for vid, title, duration, embeddable in VIDEOS]})

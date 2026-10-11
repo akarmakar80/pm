@@ -1,0 +1,46 @@
+# One term per line, matched as whole words, case-insensitive.
+# Biology terms in the Class 10 syllabus (sexual reproduction, sex determination, contraception,
+# sexually transmitted diseases, menstruation) and physics phrases like "naked eye" are intentionally
+# NOT listed here.
+porn
+porno
+pornography
+pornhub
+xxx
+nsfw
+nude
+nudes
+nudity
+hentai
+erotic
+erotica
+onlyfans
+camgirl
+escort
+escorts
+fetish
+stripper
+striptease
+hookup
+hot girls
+sexy
+18+
+adult only
+adults only
+fuck
+fucking
+shit
+bitch
+asshole
+cunt
+motherfucker
+gore
+beheading
+suicide method
+cocaine
+heroin
+methamphetamine
+casino
+betting
+satta
+gambling

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { formatDuration, post, useApi, type Purpose, type TopicSummary } from "@/lib/api";
+import { useUser } from "@/components/Shell";
+import { formatDuration, post, useApi, type Platform, type Purpose, type TopicSummary } from "@/lib/api";
 
 type QueueItem = {
   id: number;
@@ -48,7 +49,7 @@ const CRITERIA = [
 
 const PURPOSES: Purpose[] = ["concept", "examples", "application", "reference"];
 
-const TABS = ["Queue", "Add resource", "Channels", "Searches"] as const;
+const TABS = ["Queue", "Add resource", "Channels", "Sites", "Searches"] as const;
 
 const input = "rounded-md border border-line bg-white px-2 py-1.5 text-sm";
 
@@ -274,6 +275,59 @@ function Channels() {
   );
 }
 
+function Sites() {
+  const user = useUser();
+  const { data, reload } = useApi<Platform[]>("/api/platforms");
+  const [message, setMessage] = useState("");
+
+  async function add(form: FormData) {
+    try {
+      await post("/api/review/platforms", {
+        domain: String(form.get("domain")).trim().toLowerCase(),
+        name: form.get("name"),
+        login_url: form.get("login_url") || null,
+        note: form.get("note"),
+      });
+      setMessage("Site added.");
+      reload();
+    } catch (e) {
+      setMessage((e as Error).message);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted">
+        Links can only be added from these sites. Each item is still reviewed before the student sees it.
+      </p>
+      {user.role === "parent" && (
+        <form action={add} className="grid gap-2 rounded-lg border border-line bg-white p-4 sm:grid-cols-2">
+          <input name="domain" required placeholder="Domain, e.g. example.com" className={input} />
+          <input name="name" required minLength={2} placeholder="Site name" className={input} />
+          <input name="login_url" type="url" pattern="https://.*" placeholder="Sign-in page (if accounts are needed)" className={input} />
+          <input name="note" placeholder="Note, e.g. Free; sign in to save progress" className={input} />
+          <button className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white sm:col-span-2">Allow site</button>
+        </form>
+      )}
+      {message && <p className="text-sm">{message}</p>}
+      <table className="w-full rounded-lg border border-line bg-white text-sm">
+        <thead className="bg-canvas text-left text-muted">
+          <tr><th className="p-2">Site</th><th className="p-2">Domain</th><th className="p-2">Sign-in</th></tr>
+        </thead>
+        <tbody>
+          {data?.map((p) => (
+            <tr key={p.domain} className="border-t border-line">
+              <td className="p-2">{p.name}</td>
+              <td className="p-2 text-muted">{p.domain}</td>
+              <td className="p-2">{p.login_url ? "Account needed or optional" : "No account"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function Searches() {
   const { data } = useApi<SearchLog[]>("/api/review/searches");
   if (!data) return null;
@@ -289,7 +343,7 @@ function Searches() {
             <td className="p-2 text-muted">{s.created_at}</td>
             <td className="p-2">{s.user_name}</td>
             <td className="p-2">{s.query}</td>
-            <td className={`p-2 ${s.outcome === "out_of_syllabus" ? "text-warn" : ""}`}>
+            <td className={`p-2 ${s.outcome === "out_of_syllabus" || s.outcome === "blocked" ? "text-warn" : ""}`}>
               {s.outcome === "match" ? s.topic_title : s.outcome.replaceAll("_", " ")}
             </td>
           </tr>
@@ -320,6 +374,7 @@ export default function ReviewPage() {
       {tab === "Queue" && <Queue topics={topics} />}
       {tab === "Add resource" && <AddResource topics={topics} />}
       {tab === "Channels" && <Channels />}
+      {tab === "Sites" && <Sites />}
       {tab === "Searches" && <Searches />}
     </div>
   );

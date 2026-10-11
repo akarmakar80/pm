@@ -12,7 +12,8 @@ from pydantic import BaseModel, Field
 
 import youtube
 from auth import new_token, verify_password
-from db import add_resource, connect, init_db, link_topics
+from db import add_resource, connect, init_db, link_topics, platform_for
+from safety import is_blocked
 from search import match_topics
 
 load_dotenv()
@@ -72,8 +73,15 @@ def reviewer(user: Annotated[sqlite3.Row, Depends(current_user)]) -> sqlite3.Row
     return user
 
 
+def parent(user: Annotated[sqlite3.Row, Depends(current_user)]) -> sqlite3.Row:
+    if user["role"] != "parent":
+        raise HTTPException(403, "Parents only")
+    return user
+
+
 User = Annotated[sqlite3.Row, Depends(current_user)]
 Reviewer = Annotated[sqlite3.Row, Depends(reviewer)]
+Parent = Annotated[sqlite3.Row, Depends(parent)]
 
 
 # --- auth ---------------------------------------------------------------------------------
@@ -163,7 +171,7 @@ def all_topics(conn: Conn, _: User):
 
 @app.get("/api/search")
 def search(q: str, conn: Conn, user: User):
-    outcome, topic_ids = match_topics(conn, q)
+    outcome, topic_ids = ("blocked", []) if is_blocked(q) else match_topics(conn, q)
     conn.execute(
         "INSERT INTO searches (user_id, query, outcome, topic_id) VALUES (?, ?, ?, ?)",
         (user["id"], q, outcome, topic_ids[0] if outcome == "match" else None),
@@ -191,10 +199,13 @@ def visible_resources(conn: sqlite3.Connection, topic_id: int) -> list[dict]:
         """,
         (topic_id,),
     ).fetchall()
+    platforms = conn.execute("SELECT name, domain, login_url, note FROM platforms").fetchall()
     items = []
     for r in rows:
         item = dict(r)
         item["badge"] = f"Verified by {r['reviewer_name']}" if r["tier"] == 3 else r["source_name"]
+        platform = platform_for(platforms, r["url"])
+        item["platform"] = dict(platform) if platform else None
         items.append(item)
     return items
 
@@ -346,6 +357,10 @@ class NewResource(Review):
 def add_reviewed_resource(body: NewResource, conn: Conn, user: Reviewer):
     if conn.execute("SELECT 1 FROM resources WHERE url = ?", (body.url,)).fetchone():
         raise HTTPException(409, "This link is already in the library")
+    if not platform_for(conn.execute("SELECT domain FROM platforms").fetchall(), body.url):
+        raise HTTPException(400, "This website is not on the allowed sites list. A parent can add it under Review > Sites")
+    if is_blocked(body.title):
+        raise HTTPException(400, "The title contains blocked words")
     source = conn.execute("SELECT id FROM sources WHERE kind = 'educator'").fetchone()
     source_id = source["id"] if source else conn.execute(
         "INSERT INTO sources (kind, name, tier) VALUES ('educator', 'Educator recommendation', 3)"
@@ -353,9 +368,39 @@ def add_reviewed_resource(body: NewResource, conn: Conn, user: Reviewer):
     video_id = m.group(1) if body.type == "video" and (m := VIDEO_ID.search(body.url)) else None
     if body.type == "video" and not video_id:
         raise HTTPException(400, "Videos must be YouTube links")
+    if video_id and (key := os.getenv("YOUTUBE_API_KEY")):
+        with httpx.Client(timeout=30) as client:
+            videos = youtube.fetch_videos(client, key, [video_id])
+        if not videos:
+            raise HTTPException(400, "YouTube video not found")
+        if reason := youtube.unsafe_reason(videos[0]):
+            raise HTTPException(400, reason)
     resource_id = add_resource(conn, source_id, body.type, body.title, body.url, "candidate", video_id=video_id)
     link_topics(conn, resource_id, [body.topic_id], body.purpose)
     return {"id": resource_id, "status": apply_review(conn, resource_id, body, user["id"])}
+
+
+@app.get("/api/platforms")
+def platforms(conn: Conn, _: User):
+    return [dict(r) for r in conn.execute("SELECT id, domain, name, login_url, note FROM platforms ORDER BY name")]
+
+
+class NewPlatform(BaseModel):
+    domain: str = Field(pattern=r"^[a-z0-9.-]+\.[a-z]{2,}$")
+    name: str = Field(min_length=2)
+    login_url: str | None = Field(default=None, pattern=r"^https://")
+    note: str = ""
+
+
+@app.post("/api/review/platforms")
+def add_platform(body: NewPlatform, conn: Conn, _: Parent):
+    if conn.execute("SELECT 1 FROM platforms WHERE domain = ?", (body.domain,)).fetchone():
+        raise HTTPException(409, "This site is already allowed")
+    conn.execute(
+        "INSERT INTO platforms (domain, name, login_url, note) VALUES (?, ?, ?, ?)",
+        (body.domain, body.name, body.login_url or None, body.note),
+    )
+    return {"ok": True}
 
 
 @app.get("/api/review/sources")

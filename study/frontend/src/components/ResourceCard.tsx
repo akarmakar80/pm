@@ -24,7 +24,7 @@ export default function ResourceCard({ item, onReported }: { item: Resource; onR
         <div className="aspect-video bg-black">
           <iframe
             className="h-full w-full"
-            src={`https://www.youtube-nocookie.com/embed/${item.video_id}?rel=0`}
+            src={`https://www.youtube-nocookie.com/embed/${item.video_id}?rel=0&iv_load_policy=3`}
             title={item.title}
             allow="encrypted-media; picture-in-picture; fullscreen"
             allowFullScreen
@@ -49,6 +49,14 @@ export default function ResourceCard({ item, onReported }: { item: Resource; onR
           </a>
         )}
         {item.recommendation && <p className="text-sm italic text-muted">&ldquo;{item.recommendation}&rdquo;</p>}
+        {item.platform?.login_url && (
+          <p className="flex flex-wrap items-center gap-2 rounded-md bg-accent/15 px-3 py-2 text-xs">
+            <span>{item.platform.note}.</span>
+            <a href={item.platform.login_url} target="_blank" rel="noreferrer" className="font-medium text-brand hover:underline">
+              Sign in to {item.platform.name}
+            </a>
+          </p>
+        )}
         <button onClick={report} className="text-xs text-muted hover:text-warn">
           Report a problem
         </button>

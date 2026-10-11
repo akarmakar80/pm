@@ -15,6 +15,7 @@ const NAV = [
   { href: "/", label: "Home" },
   { href: "/library", label: "My Library" },
   { href: "/study", label: "Subjects" },
+  { href: "/sites", label: "Learning sites" },
 ];
 
 export default function Shell({ children }: { children: React.ReactNode }) {
